@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Listagem de Consultas</title>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1 class="mt-2">Listagem de Consultas</h1>
+        <p class="mt-2" th:text="${subtitulo}"></p>
+        <div th:if="${mensagem}" class="alert alert-success" th:text="${mensagem}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+        <div class="d-flex justify-content-end my-2">
+            <a href="/consultas/cadastrar">
+                <button type="button" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Cadastrar
+                </button>
+            </a>
+        </div>
+        <div class="card mb-2">
+            <div class="card-header">
+                Filtros
+            </div>
+            <div class="card-body">
+                <form method="get">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="datainicio" class="form-label">Data | Inicio:</label>
+                                <input type="datetime-local" name="datainicio" class="form-control" id="datainicio" th:value="${datainicio}" aria-describedby="datainicio">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="datafim" class="form-label">Data | Fim:</label>
+                                <input type="datetime-local" name="datafim" class="form-control" id="datafim" th:value="${datafim}" aria-describedby="datafim">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end my-2 gap-2">
+                            <a th:href="@{/consultas/listar}" class="btn btn-secondary">
+                            <i class="fa-solid fa-delete-left"></i>
+                                Limpar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                Pesquisar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Paciente</th>
+                        <th scope="col">Médico</th>
+                        <th scope="col">Editar</th>
+                        <th scope="col">Excluir</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${consultas}">
+                        <td th:text="${c.id}"></td>
+                        <td th:text="${#temporals.format(c.data, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${c.paciente.nome}"></td>
+                        <td th:text="${c.medico.nome}"></td>
+                        <td>
+                            <a th:href="@{/consultas/editar/{id}(id=${c.id})}">
+                                <button type="button" class="btn btn-primary">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </a>
+                        </td>
+                        <td>
+                            <a onclick="return window.confirm('Tem certeza que deseja excluir este registro?')"  th:href="@{/consultas/deletar/{id}(id=${c.id})}">
+                                <button type="button" class="btn btn-danger">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

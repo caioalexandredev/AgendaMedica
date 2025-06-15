@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Listagem de Médicos</title>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1 class="mt-2">Listagem de Médicos</h1>
+        <div th:if="${mensagem}" class="alert alert-success" th:text="${mensagem}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+        <div class="d-flex justify-content-end my-2">
+            <a href="/medicos/cadastrar">
+                <button type="button" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Cadastrar
+                </button>
+            </a>
+        </div>
+        <div class="card mb-2">
+            <div class="card-header">
+                Filtros
+            </div>
+            <div class="card-body">
+                <form method="get">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome:</label>
+                                <input type="text" name="nome" class="form-control" id="nome" th:value="${nome}" aria-describedby="nome">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="crm" class="form-label">CRM:</label>
+                                <input type="text" name="crm" class="form-control" id="crm" th:value="${crm}" aria-describedby="crm">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end my-2 gap-2">
+                            <a th:href="@{/medicos/listar}" class="btn btn-secondary">
+                                <i class="fa-solid fa-delete-left"></i>
+                                Limpar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                Pesquisar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">CRM</th>
+                        <th scope="col">Consultas</th>
+                        <th scope="col">Editar</th>
+                        <th scope="col">Excluir</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${medicos}">
+                        <td th:text="${m.id}"> </td>
+                        <td th:text="${m.nome}"> </td>
+                        <td th:text="${m.crm}"> </td>
+                        <td>
+                            <a th:href="@{/consultas/medico/{id}/listar(id=${m.id})}">
+                                <button type="button" class="btn btn-success">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </a>
+                        </td>
+                        <td>
+                            <a th:href="@{/medicos/editar/{id}(id=${m.id})}">
+                                <button type="button" class="btn btn-primary">
+                                    <i class="fa-solid fa-marker"></i>
+                                </button>
+                            </a>
+                        </td>
+                        <td>
+                            <a onclick="return window.confirm('Tem certeza que deseja excluir este registro?')"  th:href="@{/medicos/deletar/{id}(id=${m.id})}">
+                                <button type="button" class="btn btn-danger">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

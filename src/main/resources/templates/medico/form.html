@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Formulário de Médico</title>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1 class="mt-2" th:text="${medico.id == 0 || medico.id == null ? 'Cadastro de Médico' : 'Edição de Médico'}"></h1>
+        <form th:object="${medico}" method="post" th:action="${medico.id == 0 || medico.id == null ? '/medicos/cadastrar' : '/medicos/editar'}">
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <input type="hidden" th:field="*{id}">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome*</label>
+                                <input type="text" th:field="*{nome}" name="nome" class="form-control" id="nome" maxlength="200">
+                                <div id="nomeError" class="form-text text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="crm" class="form-label">CRM*</label>
+                                <input type="text" th:field="*{crm}" name="crm" class="form-control" id="crm">
+                                <div id="crmError" class="form-text text-danger" th:if="${#fields.hasErrors('crm')}" th:errors="*{crm}"></div>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    Salvar
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        const crmMask = new Inputmask("CRM-[AA] *{1,30}", {
+            definitions: {
+                'A': {
+                    validator: "[A-Z]",
+                    casing: "upper"
+                },
+                '*': {
+                    validator: "[0-9]",
+                    casing: "upper"
+                }
+            },
+            howMaskOnHover: false,
+            showMaskOnFocus: true
+        });
+        crmMask.mask(document.getElementById('crm'));
+    </script>
+</main>
+</body>
+</html>

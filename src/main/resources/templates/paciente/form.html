@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Formulário de Paciente</title>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1 class="mt-2" th:text="${paciente.id == 0 || paciente.id == null ? 'Cadastro de Paciente' : 'Edição de Paciente'}"></h1>
+        <form th:object="${paciente}" method="post" th:action="${paciente.id == 0 || paciente.id == null ? '/pacientes/cadastrar' : '/pacientes/editar'}"
+        >
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <input type="hidden" th:field="*{id}">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome*</label>
+                                <input type="text" th:field="*{nome}" name="nome" class="form-control" id="nome">
+                                <div id="nomeError" class="form-text text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="telefone" class="form-label">Telefone*</label>
+                                <input type="text" th:field="*{telefone}" name="telefone" class="form-control" id="telefone">
+                                <div id="telefoneError" class="form-text text-danger" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></div>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+   <script>
+        const im = new Inputmask({"mask": "(99) 9 9999-9999"});
+        im.mask(document.getElementById('telefone'));
+   </script>
+</main>
+</body>
+</html>

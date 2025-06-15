@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Gerar Agenda</title>
+</head>
+<body>
+<main>
+    <style>
+        .slash {
+            width: 2px;
+            height: 30px;
+            background-color: black;
+            margin: 0 4px;
+
+            transform: rotate(15deg);
+        }
+    </style>
+    <div class="container">
+        <h1 class="mt-2">Gerar Agenda</h1>
+        <p class="mb-0"><strong>Médico:</strong> <span class="mt-2" th:text="${medico.nome}"></span></p>
+        <p><strong>Data:</strong> <span th:text="${#temporals.format(data, 'dd/MM/yyyy')}"></span></p>
+        <div th:if="${mensagem}" class="alert alert-success" th:text="${mensagem}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+        <form th:object="${config}" method="post" action="/agenda/gerar">
+            <input type="hidden" name="medicoId" th:value="${medico.id}" />
+            <input type="hidden" name="data" th:value="${#temporals.format(data, 'yyyy-MM-dd')}" />
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Configuração da Geração
+                        </div>
+                        <div class="card-body">
+                            <div class="card mb-2">
+                                <div class="card-header">
+                                    Horário
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="inicio" class="form-label">Inicio*</label>
+                                                <input
+                                                    type="time"
+                                                    th:value="${config.inicio != null ? #temporals.format(config.inicio, 'HH:mm') : ''}"
+                                                    name="inicio"
+                                                    class="form-control"
+                                                    id="inicio"
+                                                    required
+                                                >
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="fim" class="form-label">Fim*</label>
+                                                <input
+                                                    type="time"
+                                                    th:value="${config.fim != null ? #temporals.format(config.fim, 'HH:mm') : ''}"
+                                                    name="fim"
+                                                    class="form-control"
+                                                    id="fim"
+                                                    required
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-2" id="card-intervalos">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-4 d-flex align-items-center">
+                                            Intervalos
+                                        </div>
+                                        <div class="col-md-8 d-flex justify-content-end gap-2">
+                                            <button type="button" id="btn-adicionar" class="btn btn-success">
+                                                <i class="fa-solid fa-plus"></i> Adicionar
+                                            </button>
+                                            <button type="button" id="btn-anterior" class="btn btn-secondary">
+                                                <i class="fa-solid fa-angle-left"></i>
+                                            </button>
+                                            <button type="button" id="btn-proximo" class="btn btn-secondary">
+                                                <i class="fa-solid fa-angle-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body" id="intervalos-container">
+                                    <div id="intervalo-empty-state" class="alert alert-warning text-center">
+                                        Nenhum intervalo adicionado.
+                                    </div>
+
+                                    <template id="intervalo-template">
+                                        <div class="row intervalo-row mt-2">
+                                            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                                                <span class="container-intervalo-atual me-1"></span>
+                                                <div class="slash"></div>
+                                                <span class="container-intervalo-total ms-1"></span>
+                                                <button type="button" class="btn btn-danger btn-sm ms-3 btn-excluir">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Início*</label>
+                                                    <input type="text" name="inicio[]" class="form-control timepicker-inicio" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Fim*</label>
+                                                    <input type="text" name="fim[]" class="form-control timepicker-fim" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="tempo" class="form-label">Tempo de Consulta*</label>
+                                        <div class="input-group mb-3">
+                                            <input th:field="*{tempo}" type="number" name="tempo" class="form-control" id="tempo" required>
+                                            <span class="input-group-text" id="basic-addon2">Minutos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-success">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                    Salvar Padrão
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-eye"></i>
+                                    Visualizar Agenda Prévia
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Agenda Gerada - Prévia
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning" role="alert">
+                                Aguardando geração de agenda pelas configurações do painel a esquerda.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function() {
+            const $intervalosContainer = $('#intervalos-container');
+            const $cardBody = $intervalosContainer;
+            const $btnAdicionar = $('#btn-adicionar');
+            const $btnAnterior = $('#btn-anterior');
+            const $btnProximo = $('#btn-proximo');
+            const $form = $('form');
+            const intervaloTemplate = document.getElementById('intervalo-template');
+
+            const optionsInicio = { 'timeFormat': 'HH:mm', 'interval': 15, 'defaultTime': '12:00', 'startTime': '08:00', 'dynamic': false};
+            const optionsFim = { 'timeFormat': 'HH:mm', 'interval': 15, 'defaultTime': '14:00', 'startTime': '08:00', 'dynamic': false};
+
+            function inicializarTimepickers($container) {
+                $container.find('.timepicker-inicio').timepicker(optionsInicio);
+                $container.find('.timepicker-fim').timepicker(optionsFim);
+            }
+
+            let indiceAtual = 0;
+            const maxIntervalos = 9;
+
+            function atualizarVisualizacao() {
+                const $todosIntervalos = $intervalosContainer.find('.intervalo-row');
+                const totalIntervalos = $todosIntervalos.length;
+                const $emptyState = $('#intervalo-empty-state');
+
+                if (totalIntervalos === 0) {
+                    $emptyState.show();
+                    $todosIntervalos.hide();
+                    $btnAnterior.hide();
+                    $btnProximo.hide();
+                } else {
+                    $emptyState.hide();
+                    $btnAnterior.show();
+                    $btnProximo.show();
+
+                    $todosIntervalos.hide();
+                    const $intervaloVisivel = $todosIntervalos.eq(indiceAtual);
+                    $intervaloVisivel.css('display', 'flex');
+
+                    $todosIntervalos.each(function(i) {
+                        $(this).find('input[name="inicio[]"]').attr('name', `intervalos[${i}].inicio`);
+                        $(this).find('input[name="fim[]"]').attr('name', `intervalos[${i}].fim`);
+
+                        const $containerAtual = $(this).find('.container-intervalo-atual');
+                        const $containerTotal = $(this).find('.container-intervalo-total');
+                        $containerAtual.html(`<i class="fa-solid fa-${i + 1}"></i>`);
+                        $containerTotal.html(`<i class="fa-solid fa-${totalIntervalos}"></i>`);
+                    });
+                }
+
+                $btnAnterior.prop('disabled', indiceAtual === 0);
+                $btnProximo.prop('disabled', indiceAtual >= totalIntervalos - 1);
+                $btnAdicionar.prop('disabled', totalIntervalos >= maxIntervalos);
+            }
+
+            $btnAdicionar.on('click', function() {
+                if ($intervalosContainer.find('.intervalo-row').length >= maxIntervalos) return;
+
+                const clone = intervaloTemplate.content.cloneNode(true);
+                const $novoIntervalo = $(clone);
+
+                $intervalosContainer.append($novoIntervalo);
+
+                inicializarTimepickers($(document));
+
+                indiceAtual = $intervalosContainer.find('.intervalo-row').length - 1;
+                atualizarVisualizacao();
+            });
+
+            $intervalosContainer.on('click', '.btn-excluir', function() {
+                const $rowParaExcluir = $(this).closest('.intervalo-row');
+
+                $rowParaExcluir.remove();
+
+                const totalRestante = $intervalosContainer.find('.intervalo-row').length;
+                if (indiceAtual >= totalRestante) {
+                    indiceAtual = Math.max(0, totalRestante - 1);
+                }
+
+                atualizarVisualizacao();
+            });
+
+            $btnProximo.on('click', function() {
+                if (indiceAtual < $intervalosContainer.find('.intervalo-row').length - 1) {
+                    indiceAtual++;
+                    atualizarVisualizacao();
+                }
+            });
+
+            $btnAnterior.on('click', function() {
+                if (indiceAtual > 0) {
+                    indiceAtual--;
+                    atualizarVisualizacao();
+                }
+            });
+
+            $form.on('submit', function(event) {
+                $('.error-message-intervalo').remove();
+
+                let erroEncontrado = false;
+
+                const $todosIntervalos = $cardBody.find('.intervalo-row');
+                $todosIntervalos.each(function(index, intervalo) {
+                    const $intervalo = $(intervalo);
+                    const $inicio = $intervalo.find('.timepicker-inicio');
+                    const $fim = $intervalo.find('.timepicker-fim');
+
+                    let $campoInvalido = null;
+
+                    if (!validarHorario($inicio.val())) {
+                        $campoInvalido = $inicio;
+                    } else if (!validarHorario($fim.val())) {
+                        $campoInvalido = $fim;
+                    }
+
+                    if ($campoInvalido) {
+                        event.preventDefault();
+                        erroEncontrado = true;
+
+                        indiceAtual = index;
+                        atualizarVisualizacao();
+
+                        let mensagemErro = "É obrigatório preencher datas válidas aqui.";
+                        if (index > 0) {
+                            mensagemErro += " Ou o intervalo pode ser excluído.";
+                        }
+                        const $divErro = $('<div class="form-text text-danger error-message-intervalo"></div>').text(mensagemErro);
+
+                        $campoInvalido.parent().parent().parent().append($divErro);
+
+                        return false;
+                    }
+                });
+            });
+
+            function validarHorario(horario) {
+                if (typeof horario !== 'string') {
+                    return false;
+                }
+
+                if (!/^\d{2}:\d{2}$/.test(horario)) {
+                    return false;
+                }
+
+                const parts = horario.split(':');
+                const hora = parseInt(parts[0], 10);
+                const minuto = parseInt(parts[1], 10);
+
+                return !(hora > 23 || minuto > 59);
+            }
+
+            atualizarVisualizacao();
+        });
+    </script>
+</main>
+</body>
+</html>

@@ -37,7 +37,7 @@
                         </div>
                         <div class="d-flex justify-content-end my-2 gap-2">
                             <a th:href="@{/agenda/listar}" class="btn btn-secondary">
-                                <i class="fa-solid fa-delete-left"></i>
+                                <i class="fa-solid fa-soap"></i>
                                 Limpar
                             </a>
                             <button type="button" id="btn-gerar" class="btn btn-success">
@@ -62,6 +62,8 @@
                         <th scope="col">Médico</th>
                         <th scope="col">Início</th>
                         <th scope="col">Fim</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Ações</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -70,6 +72,28 @@
                         <td th:text="${h.medico.nome}"></td>
                         <td th:text="${#temporals.format(h.inicio, 'HH:mm')}"></td>
                         <td th:text="${#temporals.format(h.fim, 'HH:mm')}"></td>
+                        <td th:switch="${h.statusHorarioAgenda.id}">
+                            <span th:case="1" class="badge text-bg-success" th:text="${h.statusHorarioAgenda.descricao}"></span>
+                            <span th:case="2" class="badge text-bg-warning" th:text="${h.statusHorariaAgenda.descricao}"></span>
+                            <span th:case="3" class="badge text-bg-danger" th:text="${h.statusHorariaAgenda.descricao}"></span>
+                            <span th:case="4" class="badge text-bg-primary" th:text="${h.statusHorariaAgenda.descricao}"></span>
+
+                            <span th:case="*" class="badge text-bg-secondary" th:text="${h.statusHorariaAgenda.descricao}"></span>
+                        </td>
+                        <td style="width: 1%; white-space: nowrap;">
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/agenda/marcar/{id}(id=${h.id})}">
+                                    <button title="Marcar Consulta" type="button" class="btn btn-success">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </button>
+                                </a>
+                                <a onclick="return window.confirm('Tem certeza que deseja cancelar esta agenda?')"  th:href="@{/agenda/cancelar/{id}(id=${h.id})}">
+                                    <button title="Cancelar" type="button" class="btn btn-danger">
+                                        <i class="fa-solid fa-circle-xmark"></i>
+                                    </button>
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

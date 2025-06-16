@@ -21,7 +21,7 @@
         <p><strong>Data:</strong> <span th:text="${#temporals.format(data, 'dd/MM/yyyy')}"></span></p>
         <div th:if="${mensagem}" class="alert alert-success" th:text="${mensagem}"></div>
         <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
-        <form th:object="${config}" method="post" action="/agenda/gerar">
+        <form th:object="${config}" id="configuracaoForm" method="post" action="/agenda/gerar">
             <input type="hidden" name="medicoId" th:value="${medico.id}" />
             <input type="hidden" name="data" th:value="${#temporals.format(data, 'yyyy-MM-dd')}" />
             <div class="row">
@@ -90,6 +90,35 @@
                                         Nenhum intervalo adicionado.
                                     </div>
 
+                                    <div th:each="intervalo, iterStat : *{intervalos}" class="row intervalo-row mt-2" style="display: flex;">
+
+                                        <div class="col-md-3 d-flex justify-content-center align-items-center">
+                                            <span class="container-intervalo-atual me-1 fw-bold" th:text="${iterStat.count}"></span>
+
+                                            <div class="slash"></div>
+
+                                            <span class="container-intervalo-total ms-1 fw-bold" th:text="${#lists.size(config.intervalos)}"></span>
+
+                                            <button type="button" class="btn btn-danger btn-sm ms-3 btn-excluir">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Início*</label>
+                                                <input type="text" th:field="*{intervalos[__${iterStat.index}__].inicio}" class="form-control timepicker-inicio" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <div class="mb-3">
+                                                <label class="form-label">Fim*</label>
+                                                <input type="text" th:field="*{intervalos[__${iterStat.index}__].fim}" class="form-control timepicker-fim" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <template id="intervalo-template">
                                         <div class="row intervalo-row mt-2">
                                             <div class="col-md-3 d-flex justify-content-center align-items-center">
@@ -128,27 +157,52 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-success">
+                                <button id="btnPadraoSalvar" type="submit" class="btn btn-success">
                                     <i class="fa-solid fa-bookmark"></i>
                                     Salvar Padrão
                                 </button>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-secondary">
                                     <i class="fa-solid fa-eye"></i>
-                                    Visualizar Agenda Prévia
+                                    Gerar Prévia
+                                </button>
+                                <button id="btnSalvar"  th:if="${!#lists.isEmpty(horarios)}" type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    Salvar
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="card">
+                    <div class="card overflow-scroll" style="max-height: 559px;">
                         <div class="card-header">
                             Agenda Gerada - Prévia
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-warning" role="alert">
+                            <div th:if="${#lists.isEmpty(horarios)}" class="alert alert-warning" role="alert">
                                 Aguardando geração de agenda pelas configurações do painel a esquerda.
                             </div>
+
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">N°</th>
+                                    <th scope="col">Início</th>
+                                    <th scope="col">Fim</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="horario, iterStat : ${horarios}">
+                                        <th scope="row" th:text="${(iterStat.index + 1)}"></th>
+                                        <td th:text="${horario.inicio}"></td>
+                                        <td th:text="${horario.fim}"></td>
+                                        <td>
+                                            <span class="badge text-bg-primary">DISPONÍVEL</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -252,7 +306,14 @@
                 }
             });
 
+            var botaoSubmit;
+
+            $('#configuracaoForm button[type="submit"]').on('click', function() {
+                botaoSubmit = $(this);
+            });
+
             $form.on('submit', function(event) {
+                event.preventDefault();
                 $('.error-message-intervalo').remove();
 
                 let erroEncontrado = false;
@@ -272,7 +333,6 @@
                     }
 
                     if ($campoInvalido) {
-                        event.preventDefault();
                         erroEncontrado = true;
 
                         indiceAtual = index;
@@ -289,6 +349,21 @@
                         return false;
                     }
                 });
+
+                var form = $('#configuracaoForm');
+                var action = '';
+
+                if (botaoSubmit.attr('id') === 'btnSalvar') {
+                    action = '/agenda/salvar';
+                } else if (botaoSubmit.attr('id') === 'btnPadraoSalvar') {
+                    action = '/agenda/padrao/salvar';
+                }
+
+                if (action) {
+                    form.attr('action', action);
+                }
+
+                form[0].submit();
             });
 
             function validarHorario(horario) {

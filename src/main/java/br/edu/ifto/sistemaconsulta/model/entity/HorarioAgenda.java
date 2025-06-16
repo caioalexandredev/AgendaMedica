@@ -1,0 +1,65 @@
+package br.edu.ifto.sistemaconsulta.model.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalTime;
+
+@Entity
+public class HorarioAgenda {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @NotNull(message = "O horário de início é obrigatório.")
+    @DateTimeFormat(pattern = "HH:mm")
+    private LocalTime inicio;
+
+    @NotNull(message = "O horário de fim é obrigatório.")
+    @DateTimeFormat(pattern = "HH:mm")
+    private LocalTime fim;
+
+    @Valid
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_medico")
+    private Medico medico;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_status_horario_agenda")
+    private StatusHorarioAgenda statusHorarioAgenda;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public LocalTime getFim() {
+        return fim;
+    }
+
+    public void setFim(LocalTime fim) {
+        this.fim = fim;
+    }
+
+    public LocalTime getInicio() {
+        return inicio;
+    }
+
+    public void setInicio(LocalTime inicio) {
+        this.inicio = inicio;
+    }
+
+    public Medico getMedico() {
+        return medico;
+    }
+
+    public void setMedico(Medico medico) {
+        this.medico = medico;
+    }
+}

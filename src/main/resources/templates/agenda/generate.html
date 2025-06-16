@@ -21,7 +21,7 @@
         <p><strong>Data:</strong> <span th:text="${#temporals.format(data, 'dd/MM/yyyy')}"></span></p>
         <div th:if="${mensagem}" class="alert alert-success" th:text="${mensagem}"></div>
         <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
-        <form th:object="${config}" id="configuracaoForm" method="post" action="/agenda/gerar">
+        <form th:object="${agendaGerar}" id="configuracaoForm" method="post" th:action="@{/agenda/gerar/medico/{id}(id=${medico.id}, data=${data})}">
             <input type="hidden" name="medicoId" th:value="${medico.id}" />
             <input type="hidden" name="data" th:value="${#temporals.format(data, 'yyyy-MM-dd')}" />
             <div class="row">
@@ -42,12 +42,12 @@
                                                 <label for="inicio" class="form-label">Inicio*</label>
                                                 <input
                                                     type="time"
-                                                    th:value="${config.inicio != null ? #temporals.format(config.inicio, 'HH:mm') : ''}"
+                                                    th:value="${agendaGerar.inicio != null ? #temporals.format(agendaGerar.inicio, 'HH:mm') : ''}"
                                                     name="inicio"
                                                     class="form-control"
                                                     id="inicio"
-                                                    required
                                                 >
+                                                <div id="horarioInicioError" class="form-text text-danger" th:if="${#fields.hasErrors('inicio')}" th:errors="*{inicio}"></div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -55,12 +55,12 @@
                                                 <label for="fim" class="form-label">Fim*</label>
                                                 <input
                                                     type="time"
-                                                    th:value="${config.fim != null ? #temporals.format(config.fim, 'HH:mm') : ''}"
+                                                    th:value="${agendaGerar.fim != null ? #temporals.format(agendaGerar.fim, 'HH:mm') : ''}"
                                                     name="fim"
                                                     class="form-control"
                                                     id="fim"
-                                                    required
                                                 >
+                                                <div id="horarioFimError" class="form-text text-danger" th:if="${#fields.hasErrors('fim')}" th:errors="*{fim}"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -97,7 +97,7 @@
 
                                             <div class="slash"></div>
 
-                                            <span class="container-intervalo-total ms-1 fw-bold" th:text="${#lists.size(config.intervalos)}"></span>
+                                            <span class="container-intervalo-total ms-1 fw-bold" th:text="${#lists.size(agendaGerar.intervalos)}"></span>
 
                                             <button type="button" class="btn btn-danger btn-sm ms-3 btn-excluir">
                                                 <i class="fa-solid fa-trash-can"></i>
@@ -150,14 +150,19 @@
                                     <div class="mb-3">
                                         <label for="tempo" class="form-label">Tempo de Consulta*</label>
                                         <div class="input-group mb-3">
-                                            <input th:field="*{tempo}" type="number" name="tempo" class="form-control" id="tempo" required>
+                                            <input th:field="*{tempo}" type="number" name="tempo" class="form-control" id="tempo">
                                             <span class="input-group-text" id="basic-addon2">Minutos</span>
                                         </div>
+                                        <div id="horarioTempoError" class="form-text text-danger" th:if="${#fields.hasErrors('tempo')}" th:errors="*{tempo}"></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end gap-2">
-                                <button id="btnPadraoSalvar" type="submit" class="btn btn-success">
+                                <button id="btnLimpar" onclick="window.location.href = window.location.pathname + window.location.search;" type="button" class="btn btn-secondary">
+                                    <i class="fa-solid fa-soap"></i>
+                                    Limpar
+                                </button>
+                                <button id="btnPadraoSalvar" th:if="${!#lists.isEmpty(horarios)}" type="submit" class="btn btn-success">
                                     <i class="fa-solid fa-bookmark"></i>
                                     Salvar Padrão
                                 </button>
@@ -165,7 +170,7 @@
                                     <i class="fa-solid fa-eye"></i>
                                     Gerar Prévia
                                 </button>
-                                <button id="btnSalvar"  th:if="${!#lists.isEmpty(horarios)}" type="submit" class="btn btn-primary">
+                                <button id="btnSalvar" th:if="${!#lists.isEmpty(horarios)}" type="submit" class="btn btn-primary">
                                     <i class="fa-solid fa-floppy-disk"></i>
                                     Salvar
                                 </button>
@@ -351,17 +356,22 @@
                 });
 
                 var form = $('#configuracaoForm');
-                var action = '';
+                var tipo = 0;
 
                 if (botaoSubmit.attr('id') === 'btnSalvar') {
-                    action = '/agenda/salvar';
+                    tipo = 2;
                 } else if (botaoSubmit.attr('id') === 'btnPadraoSalvar') {
-                    action = '/agenda/padrao/salvar';
+                    tipo = 3;
+                } else {
+                    tipo = 1;
                 }
 
-                if (action) {
-                    form.attr('action', action);
-                }
+                var tipoInput = $('<input>')
+                    .attr('type', 'hidden')
+                    .attr('name', 'tipo')
+                    .val(tipo);
+
+                form.append(tipoInput);
 
                 form[0].submit();
             });
@@ -383,6 +393,8 @@
             }
 
             atualizarVisualizacao();
+            //TODO isso daqui quando pré carraga horarios do front, acaba resetando eles, ver uma menira de resolver
+            //inicializarTimepickers($(document));
         });
     </script>
 </main>

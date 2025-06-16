@@ -1,9 +1,11 @@
 package br.edu.ifto.sistemaconsulta.controller;
 
-import br.edu.ifto.sistemaconsulta.dto.AgendaGerarDTO;
-import br.edu.ifto.sistemaconsulta.dto.IntervaloDTO;
+import br.edu.ifto.sistemaconsulta.model.entity.AgendaGerar;
 import br.edu.ifto.sistemaconsulta.model.entity.HorarioAgenda;
+import br.edu.ifto.sistemaconsulta.model.entity.IntervaloAgendaGerar;
 import br.edu.ifto.sistemaconsulta.model.entity.Medico;
+import br.edu.ifto.sistemaconsulta.model.enums.TipoAgendaGerar;
+import br.edu.ifto.sistemaconsulta.model.repository.AgendaGerarRepository;
 import br.edu.ifto.sistemaconsulta.model.repository.MedicoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -17,9 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Transactional
 @Controller
@@ -27,6 +29,9 @@ import java.util.List;
 public class AgendaController {
     @Autowired
     MedicoRepository medicoRepository;
+
+    @Autowired
+    AgendaGerarRepository agendaGerarRepository;
 
     @GetMapping("/listar")
     public ModelAndView listar(
@@ -65,37 +70,63 @@ public class AgendaController {
 
         List<HorarioAgenda> horarios = new ArrayList<>();
 
-        model.addAttribute("config", new AgendaGerarDTO());
+        AgendaGerar agendaGerarPadrao = agendaGerarRepository.consultaPorMedico(id);
+
+        model.addAttribute("agendaGerar", Objects.requireNonNullElseGet(agendaGerarPadrao, AgendaGerar::new));
         model.addAttribute("medico", medicoRepository.medico(id));
         model.addAttribute("data", dataFormat);
         model.addAttribute("horarios", horarios);
         return new ModelAndView("/agenda/generate", model);
     }
 
-    @PostMapping("/gerar")
+    @PostMapping("/gerar/medico/{medicoId}")
     public ModelAndView doGerar(
-            @Valid @ModelAttribute AgendaGerarDTO agendaGerarDTO,
+            @Valid AgendaGerar agendaGerar,
+            BindingResult result, //Esse result tem que ficar abaixo do Valid se não estoura erro na tela
             ModelMap model,
-            BindingResult result
+            RedirectAttributes redirectAttributes
     ) {
         //TODO precisariamos de mais algumas validações aqui, ver com o professor
-        Medico medico = medicoRepository.medico(agendaGerarDTO.getMedicoId());
+        // Como o inicio ser menor que o fim em todos os campos
+        Medico medico = medicoRepository.medico(agendaGerar.getMedicoId());
 
         model.addAttribute("medico", medico);
-        model.addAttribute("data", agendaGerarDTO.getData());
-        model.addAttribute("config", agendaGerarDTO);
+        model.addAttribute("data", agendaGerar.getData());
+        model.addAttribute("agendaGerar", agendaGerar);
 
-        //TODO ao gerar os horários preciso ver se vai ter conflito,
-        // tiver preciso avisar que não vai ser gerado por isso
-        model.addAttribute("horarios", this.gerarHorarios(agendaGerarDTO, medico));
+        if(!result.hasErrors()){
+            if (agendaGerar.getIntervalos() != null) {
+                for (IntervaloAgendaGerar intervalo : agendaGerar.getIntervalos()) {
+                    intervalo.setAgendaGerar(agendaGerar);
+                }
+            }
+
+            TipoAgendaGerar tipo = TipoAgendaGerar.valueOf(agendaGerar.getTipo());
+
+            if(tipo.equals(TipoAgendaGerar.SALVAR_PADRAO)){
+                AgendaGerar agendaGerarPadrao = agendaGerarRepository.consultaPorMedico(agendaGerar.getMedicoId());
+                if(agendaGerarPadrao != null){
+                    agendaGerarRepository.remove(agendaGerarPadrao.getId());
+                }
+                agendaGerarRepository.save(agendaGerar);
+                model.addAttribute("mensagem", "Padrão de geração da agenda salvo com sucesso!");
+            } else if (tipo.equals(TipoAgendaGerar.SALVAR)){
+
+            }
+
+            //TODO ao gerar os horários preciso ver se vai ter conflito,
+            // tiver preciso avisar que não vai ser gerado por isso
+            model.addAttribute("horarios", this.gerarHorarios(agendaGerar, medico));
+        }
+
         return new ModelAndView("/agenda/generate", model);
     }
 
-    public List<HorarioAgenda> gerarHorarios(AgendaGerarDTO agendaDTO, Medico medico) {
+    public List<HorarioAgenda> gerarHorarios(AgendaGerar agendaDTO, Medico medico) {
         LocalTime inicio = agendaDTO.getInicio();
         LocalTime fim = agendaDTO.getFim();
         Integer tempoConsulta = agendaDTO.getTempo();
-        List<IntervaloDTO> intervalos = agendaDTO.getIntervalos();
+        List<IntervaloAgendaGerar> intervalos = agendaDTO.getIntervalos();
 
         List<HorarioAgenda> horarios = new ArrayList<>();
 
@@ -104,7 +135,7 @@ public class AgendaController {
             LocalTime fimConsulta = inicio.plusMinutes(tempoConsulta);
 
             boolean conflitaComIntervalo = false;
-            for (IntervaloDTO intervalo : intervalos) {
+            for (IntervaloAgendaGerar intervalo : intervalos) {
                 if (inicioConsulta.isBefore(intervalo.getFim()) && fimConsulta.isAfter(intervalo.getInicio())) {
                     conflitaComIntervalo = true;
                     break;

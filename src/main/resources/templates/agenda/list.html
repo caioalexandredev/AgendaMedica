@@ -25,12 +25,12 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="medico" class="form-label">Médico</label>
-                                <select class="form-select" id="medico" name="medico.id">
+                                <select class="form-select" id="medico" name="medico">
                                     <option selected value="">Selecione uma opção...</option>
                                     <option th:each="m : ${medicos}"
                                             th:value="${m.id}"
                                             th:text="${m.nome}"
-                                            th:selected="${medico != null} ? (${m.id} == ${medico.id}) : false">
+                                            th:selected="${medico != null} ? (${m.id} == ${medico}) : false">
                                     </option>
                                 </select>
                             </div>
@@ -51,6 +51,28 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Médico</th>
+                        <th scope="col">Início</th>
+                        <th scope="col">Fim</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="h : ${horariosAgenda}">
+                        <td th:text="${#temporals.format(h.data, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${h.medico.nome}"></td>
+                        <td th:text="${#temporals.format(h.inicio, 'HH:mm')}"></td>
+                        <td th:text="${#temporals.format(h.fim, 'HH:mm')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

@@ -2,6 +2,7 @@ package br.edu.ifto.sistemaconsulta.model.repository;
 
 import br.edu.ifto.sistemaconsulta.model.entity.AgendaGerar;
 import br.edu.ifto.sistemaconsulta.model.entity.Consulta;
+import br.edu.ifto.sistemaconsulta.model.entity.StatusHorarioAgenda;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;

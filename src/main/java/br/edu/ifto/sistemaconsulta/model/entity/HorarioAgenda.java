@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
@@ -30,6 +32,10 @@ public class HorarioAgenda {
     @ManyToOne
     @JoinColumn(name = "id_status_horario_agenda")
     private StatusHorarioAgenda statusHorarioAgenda;
+
+    @NotNull(message = "É obrigatório gerar a agenda a partir de uma data especifica.")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate data;
 
     public int getId() {
         return id;
@@ -61,5 +67,21 @@ public class HorarioAgenda {
 
     public void setMedico(Medico medico) {
         this.medico = medico;
+    }
+
+    public StatusHorarioAgenda getStatusHorarioAgenda() {
+        return statusHorarioAgenda;
+    }
+
+    public void setStatusHorarioAgenda(StatusHorarioAgenda statusHorarioAgenda) {
+        this.statusHorarioAgenda = statusHorarioAgenda;
+    }
+
+    public LocalDate getData() {
+        return data;
+    }
+
+    public void setData(LocalDate data) {
+        this.data = data;
     }
 }

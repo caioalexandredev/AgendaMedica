@@ -4,8 +4,10 @@ import br.edu.ifto.sistemaconsulta.model.entity.AgendaGerar;
 import br.edu.ifto.sistemaconsulta.model.entity.HorarioAgenda;
 import br.edu.ifto.sistemaconsulta.model.entity.IntervaloAgendaGerar;
 import br.edu.ifto.sistemaconsulta.model.entity.Medico;
-import br.edu.ifto.sistemaconsulta.model.enums.TipoAgendaGerar;
+import br.edu.ifto.sistemaconsulta.model.enums.StatusHorarioAgendaEnum;
+import br.edu.ifto.sistemaconsulta.model.enums.TipoAgendaGerarEnum;
 import br.edu.ifto.sistemaconsulta.model.repository.AgendaGerarRepository;
+import br.edu.ifto.sistemaconsulta.model.repository.HorarioAgendaRepository;
 import br.edu.ifto.sistemaconsulta.model.repository.MedicoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +35,9 @@ public class AgendaController {
 
     @Autowired
     AgendaGerarRepository agendaGerarRepository;
+
+    @Autowired
+    HorarioAgendaRepository horarioAgendaRepository;
 
     @GetMapping("/listar")
     public ModelAndView listar(
@@ -50,6 +56,17 @@ public class AgendaController {
         model.addAttribute("data", dataFormat);
         model.addAttribute("medico", medico);
         model.addAttribute("medicos", medicoRepository.medicos());
+        model.addAttribute("horariosAgenda", new ArrayList<HorarioAgenda>());
+
+        Medico medicoConsulta = new Medico();
+
+        if(medico != null && !medico.isBlank()) {
+            medicoConsulta = medicoRepository.medico(Long.valueOf(medico));
+        }
+
+        List<HorarioAgenda> horariosAgenda = horarioAgendaRepository.search(medicoConsulta.getId(), dataFormat);
+        model.addAttribute("horariosAgenda", horariosAgenda);
+
         return new ModelAndView("/agenda/list", model);
     }
 
@@ -101,17 +118,26 @@ public class AgendaController {
                 }
             }
 
-            TipoAgendaGerar tipo = TipoAgendaGerar.valueOf(agendaGerar.getTipo());
+            TipoAgendaGerarEnum tipo = TipoAgendaGerarEnum.valueOf(agendaGerar.getTipo());
 
-            if(tipo.equals(TipoAgendaGerar.SALVAR_PADRAO)){
+            if(tipo.equals(TipoAgendaGerarEnum.SALVAR_PADRAO)){
                 AgendaGerar agendaGerarPadrao = agendaGerarRepository.consultaPorMedico(agendaGerar.getMedicoId());
                 if(agendaGerarPadrao != null){
                     agendaGerarRepository.remove(agendaGerarPadrao.getId());
                 }
                 agendaGerarRepository.save(agendaGerar);
                 model.addAttribute("mensagem", "Padrão de geração da agenda salvo com sucesso!");
-            } else if (tipo.equals(TipoAgendaGerar.SALVAR)){
+            } else if (tipo.equals(TipoAgendaGerarEnum.SALVAR)){
+                //TODO ao gerar os horários preciso ver se vai ter conflito,
+                // tiver preciso avisar que não vai ser gerado por isso
+                List<HorarioAgenda> horariosAgenda = this.gerarHorarios(agendaGerar, medico);
+                horarioAgendaRepository.saveAll(horariosAgenda);
+                redirectAttributes.addFlashAttribute("mensagem", "Agenda gerada com sucesso!");
 
+                DateTimeFormatter formatador = DateTimeFormatter.ISO_LOCAL_DATE;
+                String dataFormatada = agendaGerar.getData().format(formatador);
+
+                return new ModelAndView("redirect:/agenda/listar?data=" + dataFormatada + "&medico=" + medico.getId());
             }
 
             //TODO ao gerar os horários preciso ver se vai ter conflito,
@@ -122,11 +148,12 @@ public class AgendaController {
         return new ModelAndView("/agenda/generate", model);
     }
 
-    public List<HorarioAgenda> gerarHorarios(AgendaGerar agendaDTO, Medico medico) {
-        LocalTime inicio = agendaDTO.getInicio();
-        LocalTime fim = agendaDTO.getFim();
-        Integer tempoConsulta = agendaDTO.getTempo();
-        List<IntervaloAgendaGerar> intervalos = agendaDTO.getIntervalos();
+    public List<HorarioAgenda> gerarHorarios(AgendaGerar agendaGerar, Medico medico) {
+        LocalTime inicio = agendaGerar.getInicio();
+        LocalTime fim = agendaGerar.getFim();
+        LocalDate data = agendaGerar.getData();
+        Integer tempoConsulta = agendaGerar.getTempo();
+        List<IntervaloAgendaGerar> intervalos = agendaGerar.getIntervalos();
 
         List<HorarioAgenda> horarios = new ArrayList<>();
 
@@ -147,6 +174,8 @@ public class AgendaController {
                 novoHorario.setInicio(inicioConsulta);
                 novoHorario.setFim(fimConsulta);
                 novoHorario.setMedico(medico);
+                novoHorario.setData(data);
+                novoHorario.setStatusHorarioAgenda(horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.DISPONIVEL));
                 horarios.add(novoHorario);
             }
 

@@ -1,6 +1,6 @@
 package br.edu.ifto.sistemaconsulta.model.enums;
 
-public enum TipoAgendaGerar {
+public enum TipoAgendaGerarEnum {
     GERAR("Gerar", 1),
     SALVAR("Salvar", 2),
     SALVAR_PADRAO("Salvar Padrão", 3);
@@ -8,7 +8,7 @@ public enum TipoAgendaGerar {
     private final String nomeParaExibicao;
     private final int id;
 
-    TipoAgendaGerar(String nomeParaExibicao, int id) {
+    TipoAgendaGerarEnum(String nomeParaExibicao, int id) {
         this.nomeParaExibicao = nomeParaExibicao;
         this.id = id;
     }
@@ -21,8 +21,8 @@ public enum TipoAgendaGerar {
         return id;
     }
 
-    public static TipoAgendaGerar valueOf(int id) {
-        for (TipoAgendaGerar status : values()) {
+    public static TipoAgendaGerarEnum valueOf(int id) {
+        for (TipoAgendaGerarEnum status : values()) {
             if (status.getId() == id) {
                 return status;
             }

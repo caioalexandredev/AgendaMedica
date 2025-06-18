@@ -1,5 +1,6 @@
 package br.edu.ifto.sistemaconsulta.model.repository;
 
+import br.edu.ifto.sistemaconsulta.model.entity.Consulta;
 import br.edu.ifto.sistemaconsulta.model.entity.HorarioAgenda;
 import br.edu.ifto.sistemaconsulta.model.entity.StatusHorarioAgenda;
 import br.edu.ifto.sistemaconsulta.model.enums.StatusHorarioAgendaEnum;
@@ -15,6 +16,10 @@ import java.util.List;
 public class HorarioAgendaRepository {
     @PersistenceContext
     private EntityManager em;
+
+    public HorarioAgenda find(Long id){
+        return em.find(HorarioAgenda.class, id);
+    }
 
     public StatusHorarioAgenda consultaStatusHorarioAgenda(StatusHorarioAgendaEnum statusHorarioAgendaEnum){
         return em.find(StatusHorarioAgenda.class, statusHorarioAgendaEnum.getId());
@@ -47,7 +52,11 @@ public class HorarioAgendaRepository {
         em.merge(horarioAgenda);
     }
 
-    public List<HorarioAgenda> search(Long medicoId, LocalDate data) {
+    public List<HorarioAgenda> search(
+        Long medicoId,
+        LocalDate data,
+        StatusHorarioAgendaEnum statusHorarioAgendaEnum
+    ) {
         String hql = "from HorarioAgenda h where 1=1";
 
         if (medicoId != null) {
@@ -56,6 +65,10 @@ public class HorarioAgendaRepository {
 
         if (data != null) {
             hql += " and h.data = :data";
+        }
+
+        if (statusHorarioAgendaEnum != null) {
+            hql += " and h.statusHorarioAgenda.id = :statusHorarioAgenda";
         }
 
         hql += " order by h.data, h.inicio, h.fim, h.medico.nome desc";
@@ -68,6 +81,10 @@ public class HorarioAgendaRepository {
 
         if (data != null) {
             query.setParameter("data", data);
+        }
+
+        if (statusHorarioAgendaEnum != null) {
+            query.setParameter("statusHorarioAgenda", statusHorarioAgendaEnum.getId());
         };
 
         return query.getResultList();

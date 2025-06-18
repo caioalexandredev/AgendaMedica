@@ -44,17 +44,15 @@ public class AgendaController {
     public ModelAndView listar(
             @RequestParam(value = "medico", required = false) String medico,
             @RequestParam(value = "data", required = false) String data,
-            ModelMap model) {
+            @RequestParam(value = "status", required = false) String status,
+            ModelMap model
+    ) {
 
-        LocalDate dataFormat;
-
-        if (data == null || data.isEmpty()) {
-            dataFormat = LocalDate.now();
-        } else {
-            dataFormat = LocalDate.parse(data);
-        }
+        LocalDate dataFormat = data == null || data.isEmpty() ? LocalDate.now() : LocalDate.parse(data);
+        StatusHorarioAgendaEnum statusFormat = status == null || status.isEmpty() ? StatusHorarioAgendaEnum.DISPONIVEL : StatusHorarioAgendaEnum.valueOf(status);
 
         model.addAttribute("data", dataFormat);
+        model.addAttribute("status", statusFormat);
         model.addAttribute("medico", medico);
         model.addAttribute("medicos", medicoRepository.medicos());
         model.addAttribute("horariosAgenda", new ArrayList<HorarioAgenda>());
@@ -65,7 +63,7 @@ public class AgendaController {
             medicoConsulta = medicoRepository.medico(Long.valueOf(medico));
         }
 
-        List<HorarioAgenda> horariosAgenda = horarioAgendaRepository.search(medicoConsulta.getId(), dataFormat);
+        List<HorarioAgenda> horariosAgenda = horarioAgendaRepository.search(medicoConsulta.getId(), dataFormat, statusFormat);
         model.addAttribute("horariosAgenda", horariosAgenda);
 
         return new ModelAndView("/agenda/list", model);
@@ -100,7 +98,7 @@ public class AgendaController {
     @PostMapping("/gerar/medico/{medicoId}")
     public ModelAndView doGerar(
             @Valid AgendaGerar agendaGerar,
-            BindingResult result, //Esse result tem que ficar abaixo do Valid se não estoura erro na tela
+            BindingResult result,
             ModelMap model,
             RedirectAttributes redirectAttributes
     ) {
@@ -158,7 +156,7 @@ public class AgendaController {
         Integer tempoConsulta = agendaGerar.getTempo();
         List<IntervaloAgendaGerar> intervalos = agendaGerar.getIntervalos();
 
-        List<HorarioAgenda> horariosExistentes = horarioAgendaRepository.search(medico.getId(), data);
+        List<HorarioAgenda> horariosExistentes = horarioAgendaRepository.search(medico.getId(), data, StatusHorarioAgendaEnum.DISPONIVEL);
         List<HorarioAgenda> horarios = new ArrayList<>();
 
         while (inicio.plusMinutes(tempoConsulta).isBefore(fim) || inicio.plusMinutes(tempoConsulta).equals(fim)) {
@@ -199,5 +197,27 @@ public class AgendaController {
         }
 
         return horarios;
+    }
+
+    @GetMapping("/cancelar/{id}")
+    public ModelAndView doDeletar(@PathVariable("id") Long id, RedirectAttributes redirectAttributes){
+        HorarioAgenda horarioAgenda = horarioAgendaRepository.find(id);
+
+        if (horarioAgenda == null) {
+            redirectAttributes.addFlashAttribute("erro", "Horário não encontrado!");
+            return new ModelAndView("redirect:/agenda/listar");
+        }
+
+        if (horarioAgenda.getStatusHorarioAgenda().getId() ==  StatusHorarioAgendaEnum.CANCELADO.getId()) {
+            redirectAttributes.addFlashAttribute("erro", "O horário já esta cancelado!");
+            return new ModelAndView("redirect:/agenda/listar");
+        }
+
+        horarioAgenda.setStatusHorarioAgenda(
+                horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.CANCELADO)
+        );
+        horarioAgendaRepository.update(horarioAgenda);
+        redirectAttributes.addFlashAttribute("mensagem", "Horário cancelado com sucesso!");
+        return new ModelAndView("redirect:/agenda/listar");
     }
 }

@@ -39,7 +39,7 @@ public class HorarioAgenda {
 
     @ManyToOne
     @JoinColumn(name = "id_consulta")
-    private Consulta consultar;
+    private Consulta consulta;
 
     public int getId() {
         return id;
@@ -89,11 +89,11 @@ public class HorarioAgenda {
         this.data = data;
     }
 
-    public Consulta getConsultar() {
-        return consultar;
+    public Consulta getConsulta() {
+        return consulta;
     }
 
-    public void setConsultar(Consulta consultar) {
-        this.consultar = consultar;
+    public void setConsulta(Consulta consultar) {
+        this.consulta = consultar;
     }
 }

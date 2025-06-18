@@ -1,7 +1,10 @@
 package br.edu.ifto.sistemaconsulta.controller;
 
 import br.edu.ifto.sistemaconsulta.model.entity.Consulta;
+import br.edu.ifto.sistemaconsulta.model.entity.HorarioAgenda;
+import br.edu.ifto.sistemaconsulta.model.entity.Medico;
 import br.edu.ifto.sistemaconsulta.model.repository.ConsultaRepository;
+import br.edu.ifto.sistemaconsulta.model.repository.HorarioAgendaRepository;
 import br.edu.ifto.sistemaconsulta.model.repository.MedicoRepository;
 import br.edu.ifto.sistemaconsulta.model.repository.PacienteRepository;
 import br.edu.ifto.sistemaconsulta.model.validation.Insert;
@@ -32,6 +35,8 @@ public class ConsultaController {
 
     @Autowired
     MedicoRepository medicoRepository;
+    @Autowired
+    private HorarioAgendaRepository horarioAgendaRepository;
 
     @GetMapping("/cadastrar")
     public ModelAndView cadastrar(ModelMap model, Consulta consulta){
@@ -94,6 +99,18 @@ public class ConsultaController {
 
     @GetMapping("/deletar/{id}")
     public ModelAndView doDeletar(@PathVariable("id") int id, RedirectAttributes redirectAttributes){
+        Consulta consulta = repository.consulta(id);
+
+        if (consulta == null) {
+            redirectAttributes.addFlashAttribute("erro", "Consulta não encontrada!");
+            return new ModelAndView("redirect:/agenda/listar");
+        }
+
+        if (consulta.getHorariosAgenda() != null && !consulta.getHorariosAgenda().isEmpty()) {
+            redirectAttributes.addFlashAttribute("erro", "Esta consulta possui um agendamento vinculado.");
+            return new ModelAndView("redirect:/consultas/listar");
+        }
+
         repository.remove(id);
         redirectAttributes.addFlashAttribute("mensagem", "Consulta removida com sucesso!");
         return new ModelAndView("redirect:/consultas/listar");
@@ -109,7 +126,7 @@ public class ConsultaController {
 
     @PostMapping("/editar")
     public ModelAndView doEditar(
-            @Valid Consulta consulta,
+            @Validated(Insert.class) Consulta consulta,
             BindingResult result,
             RedirectAttributes redirectAttributes,
             ModelMap model
@@ -120,6 +137,8 @@ public class ConsultaController {
             model.addAttribute("consulta", consulta);
             return new ModelAndView("/consulta/form", model);
         }
+
+        //TODO se a consulta tiver vinculado a um horário,não permitir troca de data e médico
 
         var medico = medicoRepository.medico(consulta.getMedico().getId());
         var paciente = pacienteRepository.paciente(consulta.getPaciente().getId());

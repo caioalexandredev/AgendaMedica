@@ -17,30 +17,32 @@
                         </div>
                         <input type="hidden" th:field="*{id}">
                         <div class="card-body">
-                            <!-- TODO isso aqui pode ser um autocomplete -->
                             <div class="mb-3">
                                 <label for="paciente" class="form-label">Paciente*</label>
-                                <select class="form-select" id="paciente" name="paciente.id">
-                                    <option selected value="">Selecione uma opção...</option>
-                                    <option th:each="p : ${pacientes}"
-                                            th:value="${p.id}"
-                                            th:text="${p.nome}"
-                                            th:selected="${consulta.paciente != null} ? (${p.id} == ${consulta.paciente.id}) : false">
-                                    </option>
-                                </select>
+                                <searchable-select>
+                                    <input class="form-control">
+                                    <select class="form-select" id="paciente" name="paciente.id">
+                                        <option th:each="p : ${pacientes}"
+                                                th:value="${p.id}"
+                                                th:text="${p.nome}"
+                                                th:selected="${consulta.paciente != null} ? (${p.id} == ${consulta.paciente.id}) : false">
+                                        </option>
+                                    </select>
+                                </searchable-select>
                                 <div id="pacienteError" class="form-text text-danger" th:if="${#fields.hasErrors('paciente.id')}" th:errors="*{paciente.id}"></div>
                             </div>
                             <div class="mb-3">
-                                <!-- TODO isso aqui pode ser um autocomplete -->
                                 <label for="medico" class="form-label">Médico*</label>
-                                <select class="form-select" id="medico" name="medico.id">
-                                    <option selected value="">Selecione uma opção...</option>
-                                    <option th:each="m : ${medicos}"
-                                            th:value="${m.id}"
-                                            th:text="${m.nome}"
-                                            th:selected="${consulta.medico != null} ? (${m.id} == ${consulta.medico.id}) : false">
-                                    </option>
-                                </select>
+                                <searchable-select>
+                                    <input class="form-control">
+                                    <select class="form-select" id="medico" name="medico.id">
+                                        <option th:each="m : ${medicos}"
+                                                th:value="${m.id}"
+                                                th:text="${m.nome}"
+                                                th:selected="${consulta.medico != null} ? (${m.id} == ${consulta.medico.id}) : false">
+                                        </option>
+                                    </select>
+                                </searchable-select>
                                 <div id="medicoError" class="form-text text-danger" th:if="${#fields.hasErrors('medico.id')}" th:errors="*{medico.id}"></div>
                             </div>
                             <div class="mb-3">

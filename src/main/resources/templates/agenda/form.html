@@ -16,20 +16,20 @@
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <!-- TODO isso aqui pode ser um autocomplete -->
                                 <label for="paciente" class="form-label">Paciente*</label>
-                                <select class="form-select" id="paciente" name="paciente.id">
-                                    <option selected value="">Selecione uma opção...</option>
-                                    <option th:each="p : ${pacientes}"
-                                            th:value="${p.id}"
-                                            th:text="${p.nome}"
-                                            th:selected="${consulta.paciente != null} ? (${p.id} == ${consulta.paciente.id}) : false">
-                                    </option>
-                                </select>
+                                <searchable-select>
+                                    <input class="form-control">
+                                    <select class="form-select" id="paciente" name="paciente.id">
+                                        <option th:each="p : ${pacientes}"
+                                                th:value="${p.id}"
+                                                th:text="${p.nome}"
+                                                th:selected="${consulta.paciente != null} ? (${p.id} == ${consulta.paciente.id}) : false">
+                                        </option>
+                                    </select>
+                                </searchable-select>
                                 <div id="pacienteError" class="form-text text-danger" th:if="${#fields.hasErrors('paciente.id')}" th:errors="*{paciente.id}"></div>
                             </div>
                             <div class="mb-3">
-                                <!-- TODO isso aqui pode ser um autocomplete -->
                                 <label for="medico" class="form-label">Médico*</label>
                                 <select disabled class="form-select" id="medico" name="medico.id">
                                     <option selected value="">Selecione uma opção...</option>

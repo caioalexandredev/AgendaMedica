@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Consulta {
@@ -30,10 +32,13 @@ public class Consulta {
     private Paciente paciente;
 
     @Valid
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "id_medico")
+    @NotNull
     private Medico medico;
+
+    @OneToMany(mappedBy = "consulta")
+    private List<HorarioAgenda> horariosAgenda = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -81,5 +86,13 @@ public class Consulta {
 
     public void setMedico(Medico medico) {
         this.medico = medico;
+    }
+
+    public List<HorarioAgenda> getHorariosAgenda() {
+        return horariosAgenda;
+    }
+
+    public void setHorariosAgenda(List<HorarioAgenda> horariosAgenda) {
+        this.horariosAgenda = horariosAgenda;
     }
 }

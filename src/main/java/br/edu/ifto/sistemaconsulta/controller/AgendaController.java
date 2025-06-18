@@ -218,6 +218,7 @@ public class AgendaController {
         }
 
         horarioAgenda.setStatusHorarioAgenda(StatusHorarioAgendaEnum.CANCELADO);
+        horarioAgenda.setConsulta(null);
         horarioAgendaRepository.update(horarioAgenda);
         redirectAttributes.addFlashAttribute("mensagem", "Horário cancelado com sucesso!");
         return new ModelAndView("redirect:/agenda/listar");
@@ -270,9 +271,8 @@ public class AgendaController {
 
         consulta.setPaciente(paciente);
         consulta.setData(horarioAgenda.getData().atTime(horarioAgenda.getInicio()));
-
         consultaRepository.save(consulta);
-
+        horarioAgenda.setConsulta(consulta);
         horarioAgenda.setStatusHorarioAgenda(StatusHorarioAgendaEnum.AGENDADO);
         horarioAgendaRepository.update(horarioAgenda);
 

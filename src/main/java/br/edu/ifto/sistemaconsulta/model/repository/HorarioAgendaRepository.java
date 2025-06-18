@@ -58,6 +58,8 @@ public class HorarioAgendaRepository {
             hql += " and h.data = :data";
         }
 
+        hql += " order by h.data, h.inicio, h.fim, h.medico.nome desc";
+
         Query query = em.createQuery(hql);
 
         if (medicoId != null) {

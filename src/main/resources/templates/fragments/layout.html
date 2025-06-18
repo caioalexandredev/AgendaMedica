@@ -23,11 +23,10 @@
                 $('a.nav-link').filter(function() {
                     return this.href === url;
                 }).addClass('active');
-
-                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             });
-
+        </script>
+        <script>
+            //TODO ISSO NÂO ESTÁ FUNCIONANDO DIREITO
             window.onload = function() {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));

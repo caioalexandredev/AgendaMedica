@@ -78,7 +78,7 @@
                                         <i class="fa-solid fa-marker"></i>
                                     </button>
                                 </a>
-                                <a onclick="return window.confirm('Tem certeza que deseja excluir este registro?')"  th:href="@{/medicos/deletar/{id}(id=${m.id})}">
+                                <a data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"  th:href="@{/medicos/deletar/{id}(id=${m.id})}">
                                     <button type="button" class="btn btn-danger">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
@@ -91,6 +91,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Exclusão -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel"><strong>Você está prestes a excluir um registro. </strong></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Você deseja mesmo realizar esta ação?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Confirmar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+            confirmDeleteModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var deleteUrl = button.getAttribute('href');
+                confirmDeleteBtn.setAttribute('href', deleteUrl);
+            });
+        });
+    </script>
 </main>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package br.edu.ifto.sistemaconsulta.model.entity;
 
+import br.edu.ifto.sistemaconsulta.model.enums.StatusHorarioAgendaEnum;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -29,13 +30,16 @@ public class HorarioAgenda {
     private Medico medico;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "id_status_horario_agenda")
-    private StatusHorarioAgenda statusHorarioAgenda;
+    @Enumerated(EnumType.STRING)
+    private StatusHorarioAgendaEnum statusHorarioAgenda;
 
     @NotNull(message = "É obrigatório gerar a agenda a partir de uma data especifica.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate data;
+
+    @ManyToOne
+    @JoinColumn(name = "id_consulta")
+    private Consulta consultar;
 
     public int getId() {
         return id;
@@ -69,11 +73,11 @@ public class HorarioAgenda {
         this.medico = medico;
     }
 
-    public StatusHorarioAgenda getStatusHorarioAgenda() {
+    public StatusHorarioAgendaEnum getStatusHorarioAgenda() {
         return statusHorarioAgenda;
     }
 
-    public void setStatusHorarioAgenda(StatusHorarioAgenda statusHorarioAgenda) {
+    public void setStatusHorarioAgenda(StatusHorarioAgendaEnum statusHorarioAgenda) {
         this.statusHorarioAgenda = statusHorarioAgenda;
     }
 
@@ -83,5 +87,13 @@ public class HorarioAgenda {
 
     public void setData(LocalDate data) {
         this.data = data;
+    }
+
+    public Consulta getConsultar() {
+        return consultar;
+    }
+
+    public void setConsultar(Consulta consultar) {
+        this.consultar = consultar;
     }
 }

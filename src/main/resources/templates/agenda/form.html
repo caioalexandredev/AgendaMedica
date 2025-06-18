@@ -6,19 +6,17 @@
 <body>
 <main>
     <div class="container">
-        <h1 class="mt-2" th:text="${consulta.id == 0 || consulta.id == null ? 'Cadastro de Consulta' : 'Edição de Consulta'}"></h1>
-        <form th:object="${consulta}" method="post" th:action="${consulta.id == 0 || consulta.id == null ? '/consultas/cadastrar' : '/consultas/editar'}"
-        >
+        <h1 class="mt-2">Agendar Consulta</h1>
+        <form th:object="${consulta}" method="post">
             <div class="row">
                 <div class="col-6">
                     <div class="card">
                         <div class="card-header">
                             Dados Básicos
                         </div>
-                        <input type="hidden" th:field="*{id}">
                         <div class="card-body">
-                            <!-- TODO isso aqui pode ser um autocomplete -->
                             <div class="mb-3">
+                                <!-- TODO isso aqui pode ser um autocomplete -->
                                 <label for="paciente" class="form-label">Paciente*</label>
                                 <select class="form-select" id="paciente" name="paciente.id">
                                     <option selected value="">Selecione uma opção...</option>
@@ -33,7 +31,7 @@
                             <div class="mb-3">
                                 <!-- TODO isso aqui pode ser um autocomplete -->
                                 <label for="medico" class="form-label">Médico*</label>
-                                <select class="form-select" id="medico" name="medico.id">
+                                <select disabled class="form-select" id="medico" name="medico.id">
                                     <option selected value="">Selecione uma opção...</option>
                                     <option th:each="m : ${medicos}"
                                             th:value="${m.id}"
@@ -50,7 +48,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="data" class="form-label">Data*</label>
-                                <input type="datetime-local" name="data" th:value="${consulta.data != null ? #temporals.format(consulta.data, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control" id="data">
+                                <input disabled type="datetime-local" name="data" th:value="${consulta.data != null ? #temporals.format(consulta.data, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control" id="data">
                                 <div id="dataError" class="form-text text-danger" th:if="${#fields.hasErrors('data')}" th:errors="*{data}"></div>
                             </div>
                             <div class="mb-3">
@@ -59,7 +57,7 @@
                                 <div id="observacaoError" class="form-text text-danger" th:if="${#fields.hasErrors('observacao')}" th:errors="*{observacao}"></div>
                             </div>
                             <div class="d-flex justify-content-end my-2 gap-2">
-                                <a th:href="@{/consultas/listar}" class="btn btn-secondary">
+                                <a th:href="@{/agenda/listar}" class="btn btn-secondary">
                                     <i class="fa-solid fa-delete-left"></i>
                                     Voltar
                                 </a>

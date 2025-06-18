@@ -202,30 +202,9 @@
                                         <th scope="row" th:text="${(iterStat.index + 1)}"></th>
                                         <td th:text="${horario.inicio}"></td>
                                         <td th:text="${horario.fim}"></td>
-                                        <td th:switch="${horario.statusHorarioAgenda.id}">
-                                            <div th:case="1">
-                                                <span class="badge text-bg-primary">
-                                                    DISPONÍVEL
-                                                </span>
-                                                <i
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    data-bs-title="O horário será disponibilizado para possibilitar um agendamento de consulta."
-                                                    class="fa-solid fa-circle-question text-secondary"
-                                                ></i>
-                                            </div>
-                                            <div th:case="4">
-                                                <span class="badge text-bg-danger">
-                                                    CONFLITO
-                                                </span>
-                                                <i
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    data-bs-title="Conflito detectado, horário não será salvo."
-                                                    class="fa-solid fa-circle-question text-secondary"
-                                                ></i>
-                                            </div>
-
+                                        <td th:with="status=${horario.statusHorarioAgenda}">
+                                            <span th:classappend="${status.cssClass}" class="badge" th:text="${status.nomeParaExibicao}"></span>
+                                            <i data-bs-toggle="tooltip" data-bs-placement="top" th:data-bs-title="${status.tooltipText}" class="fa-solid fa-circle-question text-secondary" ></i>
                                         </td>
                                     </tr>
                                 </tbody>

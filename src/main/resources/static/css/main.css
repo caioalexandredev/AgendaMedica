@@ -1,7 +1,8 @@
-header nav{
+header nav, .card-header{
     background: #456287;
     background: linear-gradient(65deg,rgba(69, 98, 135, 1) 0%, rgba(63, 193, 201, 1) 100%);
     font-family: "Manrope", sans-serif;
+    color: white;
 }
 
 h1 {

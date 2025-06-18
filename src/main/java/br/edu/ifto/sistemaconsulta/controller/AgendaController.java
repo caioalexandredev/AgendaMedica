@@ -1,14 +1,9 @@
 package br.edu.ifto.sistemaconsulta.controller;
 
-import br.edu.ifto.sistemaconsulta.model.entity.AgendaGerar;
-import br.edu.ifto.sistemaconsulta.model.entity.HorarioAgenda;
-import br.edu.ifto.sistemaconsulta.model.entity.IntervaloAgendaGerar;
-import br.edu.ifto.sistemaconsulta.model.entity.Medico;
+import br.edu.ifto.sistemaconsulta.model.entity.*;
 import br.edu.ifto.sistemaconsulta.model.enums.StatusHorarioAgendaEnum;
 import br.edu.ifto.sistemaconsulta.model.enums.TipoAgendaGerarEnum;
-import br.edu.ifto.sistemaconsulta.model.repository.AgendaGerarRepository;
-import br.edu.ifto.sistemaconsulta.model.repository.HorarioAgendaRepository;
-import br.edu.ifto.sistemaconsulta.model.repository.MedicoRepository;
+import br.edu.ifto.sistemaconsulta.model.repository.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,21 +35,30 @@ public class AgendaController {
     @Autowired
     HorarioAgendaRepository horarioAgendaRepository;
 
+    @Autowired
+    PacienteRepository pacienteRepository;
+
+    @Autowired
+    ConsultaRepository consultaRepository;
+
     @GetMapping("/listar")
     public ModelAndView listar(
             @RequestParam(value = "medico", required = false) String medico,
             @RequestParam(value = "data", required = false) String data,
-            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "status", required = false) StatusHorarioAgendaEnum statusHorarioAgendaEnum,
             ModelMap model
     ) {
 
         LocalDate dataFormat = data == null || data.isEmpty() ? LocalDate.now() : LocalDate.parse(data);
-        StatusHorarioAgendaEnum statusFormat = status == null || status.isEmpty() ? StatusHorarioAgendaEnum.DISPONIVEL : StatusHorarioAgendaEnum.valueOf(status);
+        statusHorarioAgendaEnum = statusHorarioAgendaEnum == null ? StatusHorarioAgendaEnum.DISPONIVEL : statusHorarioAgendaEnum;
 
         model.addAttribute("data", dataFormat);
-        model.addAttribute("status", statusFormat);
+        model.addAttribute("status", statusHorarioAgendaEnum);
         model.addAttribute("medico", medico);
+
         model.addAttribute("medicos", medicoRepository.medicos());
+        model.addAttribute("statusOptions", StatusHorarioAgendaEnum.values());
+
         model.addAttribute("horariosAgenda", new ArrayList<HorarioAgenda>());
 
         Medico medicoConsulta = new Medico();
@@ -63,7 +67,7 @@ public class AgendaController {
             medicoConsulta = medicoRepository.medico(Long.valueOf(medico));
         }
 
-        List<HorarioAgenda> horariosAgenda = horarioAgendaRepository.search(medicoConsulta.getId(), dataFormat, statusFormat);
+        List<HorarioAgenda> horariosAgenda = horarioAgendaRepository.search(medicoConsulta.getId(), dataFormat, statusHorarioAgendaEnum);
         model.addAttribute("horariosAgenda", horariosAgenda);
 
         return new ModelAndView("/agenda/list", model);
@@ -131,7 +135,7 @@ public class AgendaController {
 
                 List<HorarioAgenda> horariosDisponiveis = horariosAgenda.stream()
                         .filter(horario -> horario.getStatusHorarioAgenda() != null &&
-                                horario.getStatusHorarioAgenda().getId() == StatusHorarioAgendaEnum.DISPONIVEL.getId())
+                                horario.getStatusHorarioAgenda() == StatusHorarioAgendaEnum.DISPONIVEL)
                         .collect(Collectors.toList());
 
                 horarioAgendaRepository.saveAll(horariosDisponiveis);
@@ -186,9 +190,9 @@ public class AgendaController {
                 novoHorario.setMedico(medico);
                 novoHorario.setData(data);
                 if (conflitaComAgendamentoExistente) {
-                    novoHorario.setStatusHorarioAgenda(horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.CONFLITO));
+                    novoHorario.setStatusHorarioAgenda(StatusHorarioAgendaEnum.CONFLITO);
                 } else {
-                    novoHorario.setStatusHorarioAgenda(horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.DISPONIVEL));
+                    novoHorario.setStatusHorarioAgenda(StatusHorarioAgendaEnum.DISPONIVEL);
                 }
                 horarios.add(novoHorario);
             }
@@ -208,16 +212,71 @@ public class AgendaController {
             return new ModelAndView("redirect:/agenda/listar");
         }
 
-        if (horarioAgenda.getStatusHorarioAgenda().getId() ==  StatusHorarioAgendaEnum.CANCELADO.getId()) {
+        if (horarioAgenda.getStatusHorarioAgenda() ==  StatusHorarioAgendaEnum.CANCELADO) {
             redirectAttributes.addFlashAttribute("erro", "O horário já esta cancelado!");
             return new ModelAndView("redirect:/agenda/listar");
         }
 
-        horarioAgenda.setStatusHorarioAgenda(
-                horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.CANCELADO)
-        );
+        horarioAgenda.setStatusHorarioAgenda(StatusHorarioAgendaEnum.CANCELADO);
         horarioAgendaRepository.update(horarioAgenda);
         redirectAttributes.addFlashAttribute("mensagem", "Horário cancelado com sucesso!");
+        return new ModelAndView("redirect:/agenda/listar");
+    }
+
+    @GetMapping("/marcar/{id}")
+    public ModelAndView marcar(
+            @PathVariable("id") Long id,
+            ModelMap model,
+            Consulta consulta,
+            RedirectAttributes redirectAttributes
+    ){
+        HorarioAgenda horarioAgenda = horarioAgendaRepository.find(id);
+
+        if (horarioAgenda == null) {
+            redirectAttributes.addFlashAttribute("erro", "Horário não encontrado!");
+            return new ModelAndView("redirect:/agenda/listar");
+        }
+
+        consulta.setMedico(horarioAgenda.getMedico());
+        consulta.setData(horarioAgenda.getData().atTime(horarioAgenda.getInicio()));
+
+        model.addAttribute("pacientes", pacienteRepository.pacientes());
+        model.addAttribute("medicos", medicoRepository.medicos());
+        model.addAttribute("consulta", consulta);
+        return new ModelAndView("/agenda/form", model);
+    }
+
+    @PostMapping("/marcar/{horarioId}")
+    public ModelAndView doMarcar(
+            @PathVariable("horarioId") Long id,
+            Consulta consulta,
+            RedirectAttributes redirectAttributes
+    ){
+        HorarioAgenda horarioAgenda = horarioAgendaRepository.find(id);
+
+        if (horarioAgenda == null) {
+            redirectAttributes.addFlashAttribute("erro", "Horário não encontrado!");
+            return new ModelAndView("redirect:/agenda/listar");
+        }
+
+        consulta.setMedico(horarioAgenda.getMedico());
+
+        var paciente = pacienteRepository.paciente(consulta.getPaciente().getId());
+
+        if (paciente == null) {
+            redirectAttributes.addFlashAttribute("erro", "Paciente não encontrado!");
+            return new ModelAndView("redirect:/agenda/listar");
+        }
+
+        consulta.setPaciente(paciente);
+        consulta.setData(horarioAgenda.getData().atTime(horarioAgenda.getInicio()));
+
+        consultaRepository.save(consulta);
+
+        horarioAgenda.setStatusHorarioAgenda(StatusHorarioAgendaEnum.AGENDADO);
+        horarioAgendaRepository.update(horarioAgenda);
+
+        redirectAttributes.addFlashAttribute("mensagem", "Consulta marcada com sucesso!");
         return new ModelAndView("redirect:/agenda/listar");
     }
 }

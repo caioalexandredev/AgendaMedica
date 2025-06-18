@@ -21,7 +21,7 @@
             $(document).ready(function () {
                 var url = window.location.href;
                 $('a.nav-link').filter(function() {
-                    return this.href === url;
+                    return url.includes(this.href);
                 }).addClass('active');
             });
         </script>

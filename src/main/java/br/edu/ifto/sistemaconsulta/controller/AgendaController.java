@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Transactional
 @Controller
@@ -128,10 +129,14 @@ public class AgendaController {
                 agendaGerarRepository.save(agendaGerar);
                 model.addAttribute("mensagem", "Padrão de geração da agenda salvo com sucesso!");
             } else if (tipo.equals(TipoAgendaGerarEnum.SALVAR)){
-                //TODO ao gerar os horários preciso ver se vai ter conflito,
-                // tiver preciso avisar que não vai ser gerado por isso
                 List<HorarioAgenda> horariosAgenda = this.gerarHorarios(agendaGerar, medico);
-                horarioAgendaRepository.saveAll(horariosAgenda);
+
+                List<HorarioAgenda> horariosDisponiveis = horariosAgenda.stream()
+                        .filter(horario -> horario.getStatusHorarioAgenda() != null &&
+                                horario.getStatusHorarioAgenda().getId() == StatusHorarioAgendaEnum.DISPONIVEL.getId())
+                        .collect(Collectors.toList());
+
+                horarioAgendaRepository.saveAll(horariosDisponiveis);
                 redirectAttributes.addFlashAttribute("mensagem", "Agenda gerada com sucesso!");
 
                 DateTimeFormatter formatador = DateTimeFormatter.ISO_LOCAL_DATE;
@@ -140,8 +145,6 @@ public class AgendaController {
                 return new ModelAndView("redirect:/agenda/listar?data=" + dataFormatada + "&medico=" + medico.getId());
             }
 
-            //TODO ao gerar os horários preciso ver se vai ter conflito,
-            // tiver preciso avisar que não vai ser gerado por isso
             model.addAttribute("horarios", this.gerarHorarios(agendaGerar, medico));
         }
 
@@ -155,6 +158,7 @@ public class AgendaController {
         Integer tempoConsulta = agendaGerar.getTempo();
         List<IntervaloAgendaGerar> intervalos = agendaGerar.getIntervalos();
 
+        List<HorarioAgenda> horariosExistentes = horarioAgendaRepository.search(medico.getId(), data);
         List<HorarioAgenda> horarios = new ArrayList<>();
 
         while (inicio.plusMinutes(tempoConsulta).isBefore(fim) || inicio.plusMinutes(tempoConsulta).equals(fim)) {
@@ -170,12 +174,24 @@ public class AgendaController {
             }
 
             if (!conflitaComIntervalo) {
+                boolean conflitaComAgendamentoExistente = false;
+                for (HorarioAgenda horarioExistente : horariosExistentes) {
+                    if (inicioConsulta.isBefore(horarioExistente.getFim()) && fimConsulta.isAfter(horarioExistente.getInicio())) {
+                        conflitaComAgendamentoExistente = true;
+                        break;
+                    }
+                }
+
                 HorarioAgenda novoHorario = new HorarioAgenda();
                 novoHorario.setInicio(inicioConsulta);
                 novoHorario.setFim(fimConsulta);
                 novoHorario.setMedico(medico);
                 novoHorario.setData(data);
-                novoHorario.setStatusHorarioAgenda(horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.DISPONIVEL));
+                if (conflitaComAgendamentoExistente) {
+                    novoHorario.setStatusHorarioAgenda(horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.CONFLITO));
+                } else {
+                    novoHorario.setStatusHorarioAgenda(horarioAgendaRepository.consultaStatusHorarioAgenda(StatusHorarioAgendaEnum.DISPONIVEL));
+                }
                 horarios.add(novoHorario);
             }
 

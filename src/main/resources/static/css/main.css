@@ -1,0 +1,86 @@
+header nav{
+    background: #456287;
+    background: linear-gradient(65deg,rgba(69, 98, 135, 1) 0%, rgba(63, 193, 201, 1) 100%);
+    font-family: "Manrope", sans-serif;
+}
+
+h1 {
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+    color: rgba(69, 98, 135, 1);
+    padding-bottom: 10px;
+}
+
+footer {
+    background: #212121;
+    background: linear-gradient(65deg, rgba(33, 33, 33, 1) 0%, rgba(64, 64, 64, 1) 100%);
+}
+
+main {
+    min-height: calc(100vh - 56px - 72px);
+}
+
+:root {
+    --bs-primary: rgba(69, 98, 135, 1);
+    --bs-primary-rgb: 69, 98, 135;
+    --bs-primary-darker: rgba(55, 78, 108, 1);
+    --bs-primary-darkest: rgba(41, 58, 81, 1);
+    --bs-primary-lighter: rgba(83, 118, 162, 1);
+
+    --bs-success: #1da17c;
+    --bs-success-rgb: 29, 161, 124;
+
+    --bs-success-darker: #178163;
+    --bs-success-darkest: #10614a;
+    --bs-success-lighter: #26c095;
+}
+
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: var(--bs-primary-darker);
+    --bs-btn-hover-border-color: var(--bs-primary-darker);
+    --bs-btn-active-bg: var(--bs-primary-darkest);
+    --bs-btn-active-border-color: var(--bs-primary-darkest);
+    --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+    --bs-btn-disabled-bg: var(--bs-primary-lighter);
+    --bs-btn-disabled-border-color: var(--bs-primary-lighter);
+}
+
+.btn-success {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--bs-success);
+    --bs-btn-border-color: var(--bs-success);
+    --bs-btn-hover-bg: var(--bs-success-darker);
+    --bs-btn-hover-border-color: var(--bs-success-darker);
+    --bs-btn-active-bg: var(--bs-success-darkest);
+    --bs-btn-active-border-color: var(--bs-success-darkest);
+    --bs-btn-focus-shadow-rgb: var(--bs-success-rgb);
+    --bs-btn-disabled-bg: var(--bs-success-lighter);
+    --bs-btn-disabled-border-color: var(--bs-success-lighter);
+}
+
+.btn-outline-success {
+    --bs-btn-color: var(--bs-success);
+    --bs-btn-border-color: var(--bs-success);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--bs-success);
+    --bs-btn-hover-border-color: var(--bs-success);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--bs-success-darker);
+    --bs-btn-active-border-color: var(--bs-success-darker);
+    --bs-btn-focus-shadow-rgb: var(--bs-success-rgb);
+    --bs-btn-disabled-color: var(--bs-success-lighter);
+    --bs-btn-disabled-border-color: var(--bs-success-lighter);
+}
+
+.text-success {
+    color: var(--bs-success) !important;
+}
+
+.bg-success {
+    background-color: var(--bs-success) !important;
+}

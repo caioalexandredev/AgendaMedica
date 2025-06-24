@@ -68,9 +68,9 @@
                         <td th:text="${m.crm}"> </td>
                         <td style="width: 1%; white-space: nowrap;">
                             <div class="d-flex gap-2">
-                                <a th:href="@{/consultas/medico/{id}/listar(id=${m.id})}">
-                                    <button type="button" class="btn btn-success">
-                                        <i class="fa-solid fa-eye"></i>
+                                <a th:href="@{/consultas/listar?medico={id}(id=${m.id})}">
+                                    <button type="button" class="btn btn-info">
+                                        <i class="fa-solid fa-list"></i>
                                     </button>
                                 </a>
                                 <a th:href="@{/medicos/editar/{id}(id=${m.id})}">

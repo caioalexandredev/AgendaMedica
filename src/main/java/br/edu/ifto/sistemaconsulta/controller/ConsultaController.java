@@ -69,11 +69,22 @@ public class ConsultaController {
 
     @GetMapping("/listar")
     public ModelAndView listar(
+            @RequestParam(value = "medico", required = false) String medico,
+            @RequestParam(value = "paciente", required = false) String paciente,
             @RequestParam(value = "datainicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime datainicio,
             @RequestParam(value = "datafim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime datafim,
             ModelMap model) {
 
-        model.addAttribute("consultas", repository.search(datainicio, datafim));
+        model.addAttribute("medicos", medicoRepository.medicos());
+        model.addAttribute("pacientes", pacienteRepository.pacientes());
+
+        Long medicoId = (medico != null && !medico.isBlank()) ? Long.valueOf(medico) : null;
+        Long pacienteId = (paciente != null && !paciente.isBlank()) ? Long.valueOf(paciente) : null;
+
+        model.addAttribute("consultas", repository.search(datainicio, datafim, medicoId, pacienteId));
+
+        model.addAttribute("medico", medico);
+        model.addAttribute("paciente", paciente);
         model.addAttribute("datainicio", datainicio);
         model.addAttribute("datafim", datafim);
         return new ModelAndView("/consulta/list", model);

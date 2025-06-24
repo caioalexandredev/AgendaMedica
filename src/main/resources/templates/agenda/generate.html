@@ -179,11 +179,11 @@
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="card overflow-scroll" style="max-height: 559px;">
+                    <div class="card" style="max-height: 559px;">
                         <div class="card-header">
                             Agenda Gerada - Prévia
                         </div>
-                        <div class="card-body">
+                        <div class="card-body overflow-scroll">
                             <div th:if="${#lists.isEmpty(horarios)}" class="alert alert-warning" role="alert">
                                 Aguardando geração de agenda pelas configurações do painel a esquerda.
                             </div>

@@ -1,5 +1,6 @@
 package br.edu.ifto.sistemaconsulta.model.entity;
 
+import br.edu.ifto.sistemaconsulta.model.enums.StatusHorarioAgendaEnum;
 import br.edu.ifto.sistemaconsulta.model.validation.Insert;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -94,5 +95,17 @@ public class Consulta {
 
     public void setHorariosAgenda(List<HorarioAgenda> horariosAgenda) {
         this.horariosAgenda = horariosAgenda;
+    }
+
+    public boolean isAssociadoAgenda() {
+        if (this.horariosAgenda == null || this.horariosAgenda.isEmpty()) {
+            return false;
+        }
+        for (HorarioAgenda horario : this.horariosAgenda) {
+            if (horario.getStatusHorarioAgenda() != StatusHorarioAgendaEnum.CANCELADO) {
+                return true;
+            }
+        }
+        return false;
     }
 }

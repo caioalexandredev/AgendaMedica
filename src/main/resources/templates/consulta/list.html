@@ -7,7 +7,6 @@
 <main>
     <div class="container">
         <h1 class="mt-2">Listagem de Consultas</h1>
-        <p class="mt-2" th:text="${subtitulo}"></p>
         <div th:if="${mensagem}" class="alert alert-success" th:text="${mensagem}"></div>
         <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
         <div class="d-flex justify-content-end my-2">
@@ -25,6 +24,32 @@
             <div class="card-body">
                 <form method="get">
                     <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="paciente" class="form-label">Paciente</label>
+                                <select class="form-select" id="paciente" name="paciente">
+                                    <option selected value="">Selecione uma opção...</option>
+                                    <option th:each="p : ${pacientes}"
+                                            th:value="${p.id}"
+                                            th:text="${p.nome}"
+                                            th:selected="${paciente != null} ? (${p.id} == ${paciente}) : false">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="medico" class="form-label">Médico</label>
+                                <select class="form-select" id="medico" name="medico">
+                                    <option selected value="">Selecione uma opção...</option>
+                                    <option th:each="m : ${medicos}"
+                                            th:value="${m.id}"
+                                            th:text="${m.nome}"
+                                            th:selected="${medico != null} ? (${m.id} == ${medico}) : false">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="datainicio" class="form-label">Data | Inicio:</label>

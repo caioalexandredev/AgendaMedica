@@ -40,7 +40,9 @@
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
                                     <option selected value="">Selecione uma opção...</option>
-                                    <option th:each="s : ${statusOptions}" th:value="${s}" th:text="${s.nomeParaExibicao}" th:selected="${status != null and s == status}"> </option>
+                                    <option th:each="s : ${statusOptions}" th:value="${s}"
+                                            th:text="${s.nomeParaExibicao}"
+                                            th:selected="${status != null and s == status}"></option>
                                 </select>
                             </div>
                         </div>
@@ -123,6 +125,25 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Alerta -->
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="alertModalLabel"><strong>Alerta</strong></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var confirmDeleteModal = document.getElementById('confirmDeleteModal');
@@ -145,13 +166,17 @@
                 var data = $("#data").val();
                 var medico = $("#medico").val();
 
+                const meuAlertModal = new bootstrap.Modal($('#alertModal'));
+
                 if(!isDateValid(data)){
-                    alert("A data selecionada é inválida!");
+                    $('#alertModal').find('.modal-body p').text("A data selecionada é inválida!");
+                    meuAlertModal.show();
                     return;
                 }
 
                 if(isNaN(parseInt(medico))){
-                    alert("Médico selecionado inválido!");
+                    $('#alertModal').find('.modal-body p').text("Médico selecionado inválido!");
+                    meuAlertModal.show();
                     return;
                 }
 

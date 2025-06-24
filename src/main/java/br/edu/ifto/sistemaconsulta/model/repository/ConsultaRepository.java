@@ -48,7 +48,7 @@ public class ConsultaRepository {
         em.merge(consulta);
     }
 
-    public List<Consulta> search(LocalDateTime datainicio, LocalDateTime datafim) {
+    public List<Consulta> search(LocalDateTime datainicio, LocalDateTime datafim, Long idMedico, Long idPaciente) {
         String hql = "from Consulta c where 1=1 ";
 
         if (datainicio != null) {
@@ -59,6 +59,14 @@ public class ConsultaRepository {
             hql += " and c.data <= :datafim";
         }
 
+        if (idMedico != null) {
+            hql += " and c.medico.id = :idMedico";
+        }
+
+        if (idPaciente != null) {
+            hql += " and c.paciente.id = :idPaciente";
+        }
+
         Query query = em.createQuery(hql);
 
         if (datainicio != null) {
@@ -67,6 +75,14 @@ public class ConsultaRepository {
 
         if (datafim != null) {
             query.setParameter("datafim", datafim);
+        }
+
+        if (idMedico != null) {
+            query.setParameter("idMedico", idMedico);
+        }
+
+        if (idPaciente != null) {
+            query.setParameter("idPaciente", idPaciente);
         }
 
         return query.getResultList();

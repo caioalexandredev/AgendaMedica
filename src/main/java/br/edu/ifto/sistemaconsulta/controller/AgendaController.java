@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -79,24 +80,29 @@ public class AgendaController {
             @PathVariable("id") Long id,
             ModelMap model
     ){
-        LocalDate dataFormat;
-
-        //TODO Validar melhor essa data, se for inválida carregar dia atual
-        if (data == null || data.isEmpty()) {
-            dataFormat = LocalDate.now();
-        } else {
-            dataFormat = LocalDate.parse(data);
-        }
-
-        List<HorarioAgenda> horarios = new ArrayList<>();
-
+        LocalDate dataFormat = processarData(data);
         AgendaGerar agendaGerarPadrao = agendaGerarRepository.consultaPorMedico(id);
 
         model.addAttribute("agendaGerar", Objects.requireNonNullElseGet(agendaGerarPadrao, AgendaGerar::new));
         model.addAttribute("medico", medicoRepository.medico(id));
         model.addAttribute("data", dataFormat);
-        model.addAttribute("horarios", horarios);
+        model.addAttribute("horarios", new ArrayList<>());
         return new ModelAndView("/agenda/generate", model);
+    }
+
+    public LocalDate processarData(String data) {
+        LocalDate dataFormat;
+
+        if (data == null || data.trim().isEmpty()) {
+            dataFormat = LocalDate.now();
+        } else {
+            try {
+                dataFormat = LocalDate.parse(data);
+            } catch (DateTimeParseException e) {
+                dataFormat = LocalDate.now();
+            }
+        }
+        return dataFormat;
     }
 
     @PostMapping("/gerar/medico/{medicoId}")

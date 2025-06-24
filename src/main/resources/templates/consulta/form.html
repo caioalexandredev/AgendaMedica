@@ -34,8 +34,8 @@
                             <div class="mb-3">
                                 <label for="medico" class="form-label">Médico*</label>
                                 <searchable-select>
-                                    <input class="form-control">
-                                    <select class="form-select" id="medico" name="medico.id">
+                                    <input th:disabled="${consulta.isAssociadoAgenda()}" class="form-control">
+                                    <select th:disabled="${consulta.isAssociadoAgenda()}" class="form-select" id="medico" name="medico.id">
                                         <option th:each="m : ${medicos}"
                                                 th:value="${m.id}"
                                                 th:text="${m.nome}"
@@ -52,7 +52,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="data" class="form-label">Data*</label>
-                                <input type="datetime-local" name="data" th:value="${consulta.data != null ? #temporals.format(consulta.data, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control" id="data">
+                                <input type="datetime-local" th:disabled="${consulta.isAssociadoAgenda()}" name="data" th:value="${consulta.data != null ? #temporals.format(consulta.data, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control" id="data">
                                 <div id="dataError" class="form-text text-danger" th:if="${#fields.hasErrors('data')}" th:errors="*{data}"></div>
                             </div>
                             <div class="mb-3">

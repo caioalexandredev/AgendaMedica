@@ -62,9 +62,9 @@
                             <td th:text="${p.telefone}"> </td>
                             <td style="width: 1%; white-space: nowrap;">
                                 <div class="d-flex gap-2">
-                                    <a th:href="@{/consultas/paciente/{id}/listar(id=${p.id})}">
-                                        <button title="Visualizar Consultas" type="button" class="btn btn-success">
-                                            <i class="fa-solid fa-eye"></i>
+                                    <a th:href="@{/consultas/listar?paciente={id}(id=${p.id})}">
+                                        <button title="Visualizar Consultas" type="button" class="btn btn-info">
+                                            <i class="fa-solid fa-list"></i>
                                         </button>
                                     </a>
                                     <a th:href="@{/pacientes/editar/{id}(id=${p.id})}">

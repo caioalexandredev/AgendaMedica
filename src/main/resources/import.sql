@@ -29,8 +29,3 @@ INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUE
 INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUES ( 12, '2025-05-27T08:15:00', 180.00, 'Dor de cabeça persistente', 3, 7);
 INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUES ( 13, '2025-05-28T10:45:00', 220.00, 'Exame de rotina', 1, 8);
 INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUES ( 14, '2025-05-29T13:30:00', 210.00, 'Acompanhamento de tratamento', 2, 9);
-
-INSERT INTO status_horario_agenda (id, descricao) VALUES ( 1, 'DISPONÍVEL');
-INSERT INTO status_horario_agenda (id, descricao) VALUES ( 2, 'AGENDADO');
-INSERT INTO status_horario_agenda (id, descricao) VALUES ( 3, 'CANCELADO');
-INSERT INTO status_horario_agenda (id, descricao) VALUES ( 4, 'CONFLITO');

@@ -20,6 +20,19 @@
                         Agenda
                     </a>
                 </div>
+                <div class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Olá <strong sec:authentication="name"></strong>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">Sair</button>
+                            </form>
+                        </li>
+                        </ul>
+                    </li>
+                </div>
             </div>
         </div>
     </nav>

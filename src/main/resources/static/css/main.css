@@ -5,6 +5,12 @@ header nav, .card-header{
     color: white;
 }
 
+.home {
+    background: #f2f2f2 url(/images/bg-login-icones.png) no-repeat center top fixed;
+    font-family: "Manrope", sans-serif;
+    color: white;
+}
+
 h1 {
     font-family: "Manrope", sans-serif;
     font-optical-sizing: auto;

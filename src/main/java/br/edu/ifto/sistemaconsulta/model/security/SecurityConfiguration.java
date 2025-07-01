@@ -21,6 +21,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //TODO Criar perfis Médico, Paciente, Secretário e Administrador
+        //TODO Definifir permissões especificas (Paciente pode se cadastrar e Médico pode gerar consultas, Secretário pode Gerar Paciente e Gerar Agenda)
+        //TODO Admnistrador tudo liberado
         http.authorizeHttpRequests(
         customizer ->
                         customizer

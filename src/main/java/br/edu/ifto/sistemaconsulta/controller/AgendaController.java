@@ -237,6 +237,7 @@ public class AgendaController {
             Consulta consulta,
             RedirectAttributes redirectAttributes
     ){
+        //TODO poder gerar em bloco
         HorarioAgenda horarioAgenda = horarioAgendaRepository.find(id);
 
         if (horarioAgenda == null) {
@@ -259,6 +260,8 @@ public class AgendaController {
             Consulta consulta,
             RedirectAttributes redirectAttributes
     ){
+        //TODO isso daqui separar em duas funcionalidades, essa vai so passar pra agendado
+        // e a a outra vai ser pra gerar a consulta vinculada a esse agendamento (O Médico vai fazer isso especificamente)
         HorarioAgenda horarioAgenda = horarioAgendaRepository.find(id);
 
         if (horarioAgenda == null) {

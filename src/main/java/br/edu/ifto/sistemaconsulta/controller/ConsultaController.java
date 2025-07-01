@@ -149,13 +149,18 @@ public class ConsultaController {
             return new ModelAndView("/consulta/form", model);
         }
 
-        //TODO se a consulta tiver vinculado a um horário,não permitir troca de data e médico
-
         var medico = medicoRepository.medico(consulta.getMedico().getId());
         var paciente = pacienteRepository.paciente(consulta.getPaciente().getId());
+        var consultaAux = repository.consulta(consulta.getId());
 
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);
+
+        //Se a consulta tiver vinculado a um horário, não permitir troca de data e médico
+        if(consulta.isAssociadoAgenda()){
+            consulta.setMedico(medico);
+            consulta.setData(consultaAux.getData());
+        }
 
         repository.update(consulta);
         redirectAttributes.addFlashAttribute("mensagem", "Consulta editada com sucesso!");

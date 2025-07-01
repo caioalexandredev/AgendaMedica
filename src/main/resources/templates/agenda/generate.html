@@ -225,12 +225,28 @@
             const $form = $('form');
             const intervaloTemplate = document.getElementById('intervalo-template');
 
-            const optionsInicio = { 'timeFormat': 'HH:mm', 'interval': 15, 'defaultTime': '12:00', 'startTime': '08:00', 'dynamic': false};
-            const optionsFim = { 'timeFormat': 'HH:mm', 'interval': 15, 'defaultTime': '14:00', 'startTime': '08:00', 'dynamic': false};
+            function criarOpcoesTimepicker(defaultTime) {
+                return {
+                    timeFormat: 'HH:mm',
+                    interval: 15,
+                    startTime: '08:00',
+                    dynamic: false,
+                    ...(defaultTime ? { defaultTime } : {})
+                };
+            }
 
             function inicializarTimepickers($container) {
-                $container.find('.timepicker-inicio').timepicker(optionsInicio);
-                $container.find('.timepicker-fim').timepicker(optionsFim);
+                $container.find('.timepicker-inicio').each(function () {
+                    const valorAtual = $(this).val();
+                    const opcoes = criarOpcoesTimepicker(valorAtual || '12:00');
+                    $(this).timepicker(opcoes);
+                });
+
+                $container.find('.timepicker-fim').each(function () {
+                    const valorAtual = $(this).val();
+                    const opcoes = criarOpcoesTimepicker(valorAtual || '14:00');
+                    $(this).timepicker(opcoes);
+                });
             }
 
             let indiceAtual = 0;
@@ -394,8 +410,7 @@
             }
 
             atualizarVisualizacao();
-            //TODO isso daqui quando pré carraga horarios do front, acaba resetando eles, ver uma menira de resolver
-            //inicializarTimepickers($(document));
+            inicializarTimepickers($(document));
         });
     </script>
 </main>

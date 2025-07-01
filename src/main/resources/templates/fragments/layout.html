@@ -21,17 +21,18 @@
         <script type="text/javascript">
             $(document).ready(function () {
                 var url = window.location.href;
-                $('a.nav-link').filter(function() {
-                    return url.includes(this.href);
-                }).addClass('active');
+                $('a.nav-link').each(function () {
+                    if (url.includes(this.href)) {
+                        $(this).addClass('active');
+                    }
+                });
+
+                setTimeout(function () {
+                    $('[data-bs-toggle="tooltip"]').each(function () {
+                        new bootstrap.Tooltip(this);
+                    });
+                }, 50);
             });
-        </script>
-        <script>
-            //TODO ISSO NÂO ESTÁ FUNCIONANDO DIREITO
-            window.onload = function() {
-                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-            };
         </script>
     </body>
     <footer th:replace="~{fragments/footer :: footer}"></footer>

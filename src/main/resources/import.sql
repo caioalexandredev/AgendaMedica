@@ -29,3 +29,21 @@ INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUE
 INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUES ( 12, '2025-05-27T08:15:00', 180.00, 'Dor de cabeça persistente', 3, 7);
 INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUES ( 13, '2025-05-28T10:45:00', 220.00, 'Exame de rotina', 1, 8);
 INSERT INTO consulta (id, data, valor, observacao, id_paciente, id_medico) VALUES ( 14, '2025-05-29T13:30:00', 210.00, 'Acompanhamento de tratamento', 2, 9);
+
+INSERT INTO role (id, nome) VALUES (1, 'ROLE_ADMIN');
+INSERT INTO role (id, nome) VALUES (2, 'ROLE_USER');
+INSERT INTO role (id, nome) VALUES (3, 'ROLE_MEDICO');
+INSERT INTO role (id, nome) VALUES (4, 'ROLE_SECRETARIO');
+INSERT INTO role (id, nome) VALUES (5, 'ROLE_PACIENTE');
+
+INSERT INTO usuario (id, login, password, id_pessoa) VALUES (1, 'administrador', '$2a$10$jFW7LJBG3BATcGjxn1JWCu3G/jpVRfqgzyEXSx3I8F9IqbAZNp2Mi', 1);
+INSERT INTO usuario (id, login, password, id_pessoa) VALUES (2, 'usuario', '$2a$10$jFW7LJBG3BATcGjxn1JWCu3G/jpVRfqgzyEXSx3I8F9IqbAZNp2Mi', 2);
+INSERT INTO usuario (id, login, password, id_pessoa) VALUES (3, 'medico', '$2a$10$jFW7LJBG3BATcGjxn1JWCu3G/jpVRfqgzyEXSx3I8F9IqbAZNp2Mi', 2);
+INSERT INTO usuario (id, login, password, id_pessoa) VALUES (4, 'secretario', '$2a$10$jFW7LJBG3BATcGjxn1JWCu3G/jpVRfqgzyEXSx3I8F9IqbAZNp2Mi', 2);
+INSERT INTO usuario (id, login, password, id_pessoa) VALUES (5, 'paciente', '$2a$10$jFW7LJBG3BATcGjxn1JWCu3G/jpVRfqgzyEXSx3I8F9IqbAZNp2Mi', 2);
+
+INSERT INTO usuario_roles(roles_id, usuarios_id) VALUES (1, 1);
+INSERT INTO usuario_roles(roles_id, usuarios_id) VALUES (2, 2);
+INSERT INTO usuario_roles(roles_id, usuarios_id) VALUES (3, 3);
+INSERT INTO usuario_roles(roles_id, usuarios_id) VALUES (4, 4);
+INSERT INTO usuario_roles(roles_id, usuarios_id) VALUES (5, 5);

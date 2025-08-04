@@ -7,16 +7,16 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link" sec:authorize="hasAnyRole('ADMIN') or hasAnyRole('SECRETARIO')" href="/pacientes/listar">
+                    <a class="nav-link" sec:authorize="hasAnyRole('ROLE_ADMIN') or hasAnyRole('ROLE_SECRETARIO')" href="/pacientes/listar">
                         Pacientes
                     </a>
-                    <a class="nav-link" sec:authorize="hasAnyRole('ADMIN')"  href="/medicos/listar">
+                    <a class="nav-link" sec:authorize="hasAnyRole('ROLE_ADMIN')"  href="/medicos/listar">
                         Médicos
                     </a>
-                    <a class="nav-link" sec:authorize="hasAnyRole('MEDICO') or hasAnyRole('ADMIN')" href="/consultas/listar">
+                    <a class="nav-link" sec:authorize="hasAnyRole('ROLE_MEDICO') or hasAnyRole('ROLE_ADMIN')" href="/consultas/listar">
                         Consultas
                     </a>
-                    <a class="nav-link" sec:authorize="hasAnyRole('ADMIN') or hasAnyRole('SECRETARIO') or hasAnyRole('MEDICO')"  href="/agenda/listar" >
+                    <a class="nav-link" sec:authorize="hasAnyRole('ROLE_ADMIN') or hasAnyRole('ROLE_SECRETARIO') or hasAnyRole('ROLE_MEDICO')"  href="/agenda/listar" >
                         Agenda
                     </a>
                 </div>

@@ -1,6 +1,8 @@
 package br.edu.ifto.sistemaconsulta.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,6 +21,12 @@ public class Usuario implements Serializable, UserDetails {
     private String login;
 
     private String password;
+
+    @Valid
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_pessoa")
+    private Pessoa pessoa;
 
     @ManyToMany
     private List<Role> roles = new ArrayList<>();
@@ -40,6 +48,14 @@ public class Usuario implements Serializable, UserDetails {
 
     public String getLogin() {
         return login;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override

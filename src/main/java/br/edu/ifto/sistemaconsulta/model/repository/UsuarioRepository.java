@@ -11,7 +11,9 @@ public class UsuarioRepository {
     @PersistenceContext
     private EntityManager em;
 
-    public Usuario usuario(String id){
-        return em.find(Usuario.class, id);
+    public Usuario usuario(String login){
+        return em.createQuery("SELECT u FROM Usuario u WHERE u.login = :login", Usuario.class)
+                .setParameter("login", login)
+                .getSingleResult();
     }
 }

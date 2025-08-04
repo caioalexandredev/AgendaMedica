@@ -21,21 +21,18 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //TODO Criar perfis Médico, Paciente, Secretário e Administrador
-        //TODO Definifir permissões especificas (Paciente pode se cadastrar e Médico pode gerar consultas, Secretário pode Gerar Paciente e Gerar Agenda)
-        //TODO Admnistrador tudo liberado
         http.authorizeHttpRequests(
-        customizer ->
-                        customizer
-                            .requestMatchers("/css/**", "/js/**", "/images/**","/favicon/**").permitAll()
-                            .anyRequest()
-                            .authenticated()
+                        customizer ->
+                                customizer
+                                        .requestMatchers("/css/**", "/js/**", "/images/**","/favicon/**").permitAll()
+                                        .anyRequest()
+                                        .authenticated()
                 )
                 .formLogin(customizer ->
-                    customizer
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/pacientes/listar", true)
-                        .permitAll()
+                        customizer
+                                .loginPage("/login")
+                                .defaultSuccessUrl("/", true)
+                                .permitAll()
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/**") // CSRF desabilitado aqui
@@ -48,15 +45,27 @@ public class SecurityConfiguration {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user1 = User.withUsername("user")
+        UserDetails user = User.withUsername("user")
                 .password(passwordEncoder().encode("123"))
                 .roles("USER")
+                .build();
+        UserDetails paciente = User.withUsername("paciente")
+                .password(passwordEncoder().encode("123"))
+                .roles("PACIENTE")
+                .build();
+        UserDetails medico = User.withUsername("medico")
+                .password(passwordEncoder().encode("123"))
+                .roles("MEDICO")
+                .build();
+        UserDetails secretario = User.withUsername("secretario")
+                .password(passwordEncoder().encode("123"))
+                .roles("SECRETARIO")
                 .build();
         UserDetails admin = User.withUsername("admin")
                 .password(passwordEncoder().encode("admin"))
                 .roles("ADMIN")
                 .build();
-        return new InMemoryUserDetailsManager(user1, admin);
+        return new InMemoryUserDetailsManager(user, admin, paciente, medico, secretario);
     }
 
     /**

@@ -8,6 +8,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class ConfiguracaoSpringMvc implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("redirect:/pacientes/listar");
+        //registry.addViewController("/").setViewName("redirect:/pacientes/listar");
     }
 }

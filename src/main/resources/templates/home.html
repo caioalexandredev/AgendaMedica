@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Listagem de Pacientes</title>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1 class="mt-2">Seja Bem Vindo <strong sec:authentication="name"></strong></h1>
+        <div th:if="${mensagem}" class="alert alert-success" th:text="${mensagem}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+    </div>
+</main>
+</body>
+</html>

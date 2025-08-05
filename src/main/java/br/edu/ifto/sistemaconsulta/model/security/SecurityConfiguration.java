@@ -29,10 +29,10 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests(
                         customizer ->
                                 customizer
-                                        .requestMatchers("/pessoafisica/form").permitAll()
-                                        .requestMatchers("/pessoafisica/list").hasAnyRole("ADMIN")
-                                        .requestMatchers(HttpMethod.POST,"/pessoafisica/save").permitAll()
+                                        .requestMatchers("/cadastro").permitAll()
+                                        .requestMatchers(HttpMethod.POST,"/cadastro").permitAll()
                                         .requestMatchers("/css/**", "/js/**", "/images/**","/favicon/**").permitAll()
+                                        .requestMatchers("/pessoafisica/list").hasAnyRole("ADMIN")
                                         .anyRequest() //define que a configuração é válida para qualquer requisição.
                                         .authenticated() //define que o usuário precisa estar autenticado.
                 )

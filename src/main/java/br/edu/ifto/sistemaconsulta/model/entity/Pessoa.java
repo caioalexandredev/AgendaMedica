@@ -1,7 +1,9 @@
 package br.edu.ifto.sistemaconsulta.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -18,6 +20,12 @@ public abstract class Pessoa {
     @NotBlank(message = "Nome é obrigatório!")
     @Size(max=200, message = "O tamanho deve ser de no máximo 200 caracteres")
     private String nome;
+
+    @Valid
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 
     public Long getId() {
         return id;

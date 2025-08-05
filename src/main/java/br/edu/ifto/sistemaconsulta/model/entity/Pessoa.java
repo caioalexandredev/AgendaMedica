@@ -21,6 +21,7 @@ public abstract class Pessoa {
     @Size(max=200, message = "O tamanho deve ser de no máximo 200 caracteres")
     private String nome;
 
+    //TODO ATUALIZAR DADOS DO USUÁRIO PELO PROJETO NOS CADASTROS
     @Valid
     @NotNull
     @ManyToOne
